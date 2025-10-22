@@ -54,7 +54,6 @@ export default function CustomerList() {
   const {
     data: customersData,
     isLoading,
-    error,
   } = useQuery({
     queryKey: ['customers', filters],
     queryFn: () => customersAPI.getAll(filters),
@@ -246,7 +245,7 @@ export default function CustomerList() {
               city: values.city,
               state: values.state,
               address1: values.address1, // Map address1 to address1
-              zipCode: values.zip, // Map zip to zipCode
+              zip: values.zip, // Map zip to zip
               country: 'USA', // Default country
             },
             contactPerson: values.corporateGroup, // Map corporateGroup to contactPerson for now
@@ -257,14 +256,12 @@ export default function CustomerList() {
         createMutation.mutate({
           customerId: values.customerId,
           customerName: values.customerName,
-          location: {
-            city: values.city,
-            state: values.state,
-            address1: values.address1, // Map address1 to address1
-            zipCode: values.zip, // Map zip to zipCode
-            country: 'USA', // Default country
-          },
-          contactPerson: values.corporateGroup, // Map corporateGroup to contactPerson for now
+          salesRepId: values.salesRepId || 'rep1', // Default sales rep
+          city: values.city,
+          state: values.state,
+          address1: values.address1,
+          zip: values.zip,
+          corporateGroup: values.corporateGroup,
         });
       }
     } catch (error: any) {
@@ -361,7 +358,7 @@ export default function CustomerList() {
                 style={{ width: 200 }}
                 size="large"
                 allowClear
-                value={filters.salesRepId}
+                value={filters.salesRepId as string}
                 onChange={handleSalesRepFilter}
                 options={[
                   { label: 'David Brace', value: 'rep1' },
