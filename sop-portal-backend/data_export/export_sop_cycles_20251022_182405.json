@@ -1,0 +1,536 @@
+[
+  {
+    "_id": "68f63eb288a183a72e590df6",
+    "cycleName": "November 2025",
+    "cycleYear": 2025,
+    "cycleMonth": 11,
+    "status": "closed",
+    "dates": {
+      "startDate": "2025-11-04T13:52:47.386000",
+      "endDate": "2025-11-19T13:52:47.386000",
+      "submissionDeadline": "2025-11-27T13:52:47.386000"
+    },
+    "planningPeriod": {
+      "startYear": 2025,
+      "startMonth": 7,
+      "endYear": 2026,
+      "endMonth": 10,
+      "totalMonths": 16,
+      "months": [
+        {
+          "year": 2025,
+          "month": 7,
+          "monthLabel": "2025-07",
+          "monthName": "July 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 8,
+          "monthLabel": "2025-08",
+          "monthName": "August 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 9,
+          "monthLabel": "2025-09",
+          "monthName": "September 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "monthLabel": "2025-10",
+          "monthName": "October 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "monthLabel": "2025-11",
+          "monthName": "November 2025",
+          "isHistorical": false,
+          "isCurrent": true,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "monthLabel": "2025-12",
+          "monthName": "December 2025",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "monthLabel": "2026-01",
+          "monthName": "January 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "monthLabel": "2026-02",
+          "monthName": "February 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "monthLabel": "2026-03",
+          "monthName": "March 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "monthLabel": "2026-04",
+          "monthName": "April 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "monthLabel": "2026-05",
+          "monthName": "May 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "monthLabel": "2026-06",
+          "monthName": "June 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "monthLabel": "2026-07",
+          "monthName": "July 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "monthLabel": "2026-08",
+          "monthName": "August 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 9,
+          "monthLabel": "2026-09",
+          "monthName": "September 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 10,
+          "monthLabel": "2026-10",
+          "monthName": "October 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        }
+      ],
+      "periodLabel": "2025-07 to 2026-10"
+    },
+    "stats": {
+      "totalForecasts": 0,
+      "submittedForecasts": 0,
+      "totalSalesReps": 0,
+      "submittedSalesReps": 0,
+      "completionPercentage": 0.0
+    },
+    "createdAt": "2025-10-20T13:52:50.199000",
+    "updatedAt": "2025-10-21T05:20:36.252000",
+    "createdBy": "68f223caa2a7a8c0bacaf101",
+    "openedAt": "2025-10-21T05:16:25.577000",
+    "closedAt": "2025-10-21T05:20:36.252000"
+  },
+  {
+    "_id": "68f643d7d373d5ccfe08a3e7",
+    "cycleName": "November 2025",
+    "cycleYear": 2025,
+    "cycleMonth": 11,
+    "status": "closed",
+    "dates": {
+      "startDate": "2025-11-04T14:14:44.771000",
+      "endDate": "2025-11-19T14:14:44.771000",
+      "submissionDeadline": "2025-11-27T14:14:44.771000"
+    },
+    "planningPeriod": {
+      "startYear": 2025,
+      "startMonth": 7,
+      "endYear": 2026,
+      "endMonth": 10,
+      "totalMonths": 16,
+      "months": [
+        {
+          "year": 2025,
+          "month": 7,
+          "monthLabel": "2025-07",
+          "monthName": "July 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 8,
+          "monthLabel": "2025-08",
+          "monthName": "August 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 9,
+          "monthLabel": "2025-09",
+          "monthName": "September 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "monthLabel": "2025-10",
+          "monthName": "October 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "monthLabel": "2025-11",
+          "monthName": "November 2025",
+          "isHistorical": false,
+          "isCurrent": true,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "monthLabel": "2025-12",
+          "monthName": "December 2025",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "monthLabel": "2026-01",
+          "monthName": "January 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "monthLabel": "2026-02",
+          "monthName": "February 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "monthLabel": "2026-03",
+          "monthName": "March 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "monthLabel": "2026-04",
+          "monthName": "April 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "monthLabel": "2026-05",
+          "monthName": "May 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "monthLabel": "2026-06",
+          "monthName": "June 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "monthLabel": "2026-07",
+          "monthName": "July 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "monthLabel": "2026-08",
+          "monthName": "August 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 9,
+          "monthLabel": "2026-09",
+          "monthName": "September 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 10,
+          "monthLabel": "2026-10",
+          "monthName": "October 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        }
+      ],
+      "periodLabel": "2025-07 to 2026-10"
+    },
+    "stats": {
+      "totalForecasts": 0,
+      "submittedForecasts": 0,
+      "totalSalesReps": 0,
+      "submittedSalesReps": 0,
+      "completionPercentage": 0.0
+    },
+    "createdAt": "2025-10-20T14:14:47.859000",
+    "updatedAt": "2025-10-21T05:16:14.617000",
+    "createdBy": "68f223caa2a7a8c0bacaf101",
+    "openedAt": "2025-10-20T14:15:20.743000",
+    "closedAt": "2025-10-21T05:16:14.617000"
+  },
+  {
+    "_id": "68f71b5098a204988a280433",
+    "cycleName": "November 2025",
+    "cycleYear": 2025,
+    "cycleMonth": 11,
+    "status": "open",
+    "dates": {
+      "startDate": "2025-11-05T05:34:03.430000",
+      "endDate": "2025-11-20T05:34:03.431000",
+      "submissionDeadline": "2025-11-28T05:34:03.430000"
+    },
+    "planningPeriod": {
+      "startYear": 2025,
+      "startMonth": 7,
+      "endYear": 2026,
+      "endMonth": 10,
+      "totalMonths": 16,
+      "months": [
+        {
+          "year": 2025,
+          "month": 7,
+          "monthLabel": "2025-07",
+          "monthName": "July 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 8,
+          "monthLabel": "2025-08",
+          "monthName": "August 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 9,
+          "monthLabel": "2025-09",
+          "monthName": "September 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "monthLabel": "2025-10",
+          "monthName": "October 2025",
+          "isHistorical": true,
+          "isCurrent": false,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "monthLabel": "2025-11",
+          "monthName": "November 2025",
+          "isHistorical": false,
+          "isCurrent": true,
+          "isFuture": false
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "monthLabel": "2025-12",
+          "monthName": "December 2025",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "monthLabel": "2026-01",
+          "monthName": "January 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "monthLabel": "2026-02",
+          "monthName": "February 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "monthLabel": "2026-03",
+          "monthName": "March 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "monthLabel": "2026-04",
+          "monthName": "April 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 5,
+          "monthLabel": "2026-05",
+          "monthName": "May 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 6,
+          "monthLabel": "2026-06",
+          "monthName": "June 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 7,
+          "monthLabel": "2026-07",
+          "monthName": "July 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 8,
+          "monthLabel": "2026-08",
+          "monthName": "August 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 9,
+          "monthLabel": "2026-09",
+          "monthName": "September 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        },
+        {
+          "year": 2026,
+          "month": 10,
+          "monthLabel": "2026-10",
+          "monthName": "October 2026",
+          "isHistorical": false,
+          "isCurrent": false,
+          "isFuture": true
+        }
+      ],
+      "periodLabel": "2025-07 to 2026-10"
+    },
+    "stats": {
+      "totalForecasts": 0,
+      "submittedForecasts": 0,
+      "totalSalesReps": 0,
+      "submittedSalesReps": 0,
+      "completionPercentage": 0.0
+    },
+    "createdAt": "2025-10-21T05:34:08.571000",
+    "updatedAt": "2025-10-21T05:34:12.364000",
+    "createdBy": "68f223caa2a7a8c0bacaf101",
+    "openedAt": "2025-10-21T05:34:12.364000",
+    "closedAt": null
+  }
+]

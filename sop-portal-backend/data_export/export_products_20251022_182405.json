@@ -1,0 +1,304 @@
+[
+  {
+    "_id": "68f223cba2a7a8c0bacaf109",
+    "itemCode": "110001",
+    "description": "Peeled Garlic 12x1 LB Garland",
+    "group": {
+      "code": "G1",
+      "subgroup": "G1S7",
+      "desc": "Group 1-2"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Peeled Garlic Repack"
+    },
+    "weight": 12.0,
+    "uom": "CS",
+    "pricing": {
+      "avgPrice": 52.0,
+      "costPrice": 40.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 25000
+    },
+    "createdAt": "2025-10-17T11:08:59.472000",
+    "updatedAt": "2025-10-17T11:08:59.472000",
+    "itemDescription": "Peeled Garlic 12x1 LB Garland"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf10a",
+    "itemCode": "110002",
+    "description": "Peeled Garlic 12x3 LB Garland",
+    "group": {
+      "code": "G1",
+      "subgroup": "G1S7",
+      "desc": "Group 1-2"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Peeled Garlic Repack"
+    },
+    "weight": 36.0,
+    "uom": "CS",
+    "pricing": {
+      "avgPrice": 95.0,
+      "costPrice": 75.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 18000
+    },
+    "createdAt": "2025-10-17T11:08:59.472000",
+    "updatedAt": "2025-10-17T11:08:59.473000",
+    "itemDescription": "Peeled Garlic 12x3 LB Garland"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf10b",
+    "itemCode": "130030",
+    "description": "Garlic Puree 40 LB Bag",
+    "group": {
+      "code": "G1",
+      "subgroup": "G1S8",
+      "desc": "Group 1-2"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Garlic Puree"
+    },
+    "weight": 40.0,
+    "uom": "BAG",
+    "pricing": {
+      "avgPrice": 70.0,
+      "costPrice": 55.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 12000
+    },
+    "createdAt": "2025-10-17T11:08:59.473000",
+    "updatedAt": "2025-10-17T11:08:59.473000",
+    "itemDescription": "Garlic Puree 40 LB Bag"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf10c",
+    "itemCode": "110005",
+    "description": "Chopped Garlic 12x16 OZ",
+    "group": {
+      "code": "G1",
+      "subgroup": "G1S7",
+      "desc": "Group 1-2"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Chopped Garlic"
+    },
+    "weight": 12.0,
+    "uom": "CS",
+    "pricing": {
+      "avgPrice": 48.0,
+      "costPrice": 38.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 15000
+    },
+    "createdAt": "2025-10-17T11:08:59.473000",
+    "updatedAt": "2025-10-17T11:08:59.473000",
+    "itemDescription": "Chopped Garlic 12x16 OZ"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf10d",
+    "itemCode": "120015",
+    "description": "Ginger Paste 30 LB Bucket",
+    "group": {
+      "code": "G2",
+      "subgroup": "G2S1",
+      "desc": "Group 2-1"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Ginger Processing"
+    },
+    "weight": 30.0,
+    "uom": "BUCKET",
+    "pricing": {
+      "avgPrice": 85.0,
+      "costPrice": 68.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 8000
+    },
+    "createdAt": "2025-10-17T11:08:59.473000",
+    "updatedAt": "2025-10-17T11:08:59.473000",
+    "itemDescription": "Ginger Paste 30 LB Bucket"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf10e",
+    "itemCode": "140020",
+    "description": "Mixed Herbs 24x8 OZ",
+    "group": {
+      "code": "G3",
+      "subgroup": "G3S2",
+      "desc": "Group 3-1"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Herbs Processing"
+    },
+    "weight": 12.0,
+    "uom": "CS",
+    "pricing": {
+      "avgPrice": 62.0,
+      "costPrice": 48.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 10000
+    },
+    "createdAt": "2025-10-17T11:08:59.473000",
+    "updatedAt": "2025-10-17T11:08:59.473000",
+    "itemDescription": "Mixed Herbs 24x8 OZ"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf10f",
+    "itemCode": "110010",
+    "description": "Minced Garlic 6x32 OZ",
+    "group": {
+      "code": "G1",
+      "subgroup": "G1S7",
+      "desc": "Group 1-2"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Minced Garlic"
+    },
+    "weight": 12.0,
+    "uom": "CS",
+    "pricing": {
+      "avgPrice": 55.0,
+      "costPrice": 42.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 14000
+    },
+    "createdAt": "2025-10-17T11:08:59.473000",
+    "updatedAt": "2025-10-17T11:08:59.473000",
+    "itemDescription": "Minced Garlic 6x32 OZ"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf110",
+    "itemCode": "110015",
+    "description": "Roasted Garlic 12x12 OZ",
+    "group": {
+      "code": "G1",
+      "subgroup": "G1S7",
+      "desc": "Group 1-2"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Roasted Garlic"
+    },
+    "weight": 9.0,
+    "uom": "CS",
+    "pricing": {
+      "avgPrice": 58.0,
+      "costPrice": 45.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 9000
+    },
+    "createdAt": "2025-10-17T11:08:59.473000",
+    "updatedAt": "2025-10-17T11:08:59.473000",
+    "itemDescription": "Roasted Garlic 12x12 OZ"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf111",
+    "itemCode": "150025",
+    "description": "Cilantro Paste 20 LB Bag",
+    "group": {
+      "code": "G3",
+      "subgroup": "G3S3",
+      "desc": "Group 3-2"
+    },
+    "manufacturing": {
+      "location": "Miami",
+      "line": "Herbs Processing"
+    },
+    "weight": 20.0,
+    "uom": "BAG",
+    "pricing": {
+      "avgPrice": 42.0,
+      "costPrice": 32.0,
+      "currency": "USD"
+    },
+    "isActive": true,
+    "metadata": {
+      "salesYTD": 7000
+    },
+    "createdAt": "2025-10-17T11:08:59.473000",
+    "updatedAt": "2025-10-17T11:08:59.473000",
+    "itemDescription": "Cilantro Paste 20 LB Bag"
+  },
+  {
+    "_id": "68f4c068eeef231f813bd98f",
+    "itemCode": "323",
+    "itemDescription": "3432",
+    "group": {
+      "code": "G2",
+      "subgroup": "43",
+      "desc": "234"
+    },
+    "manufacturing": {
+      "location": "Los Angeles",
+      "line": "234"
+    },
+    "pricing": {
+      "avgPrice": 323.0,
+      "costPrice": 23432.0,
+      "currency": "USD"
+    },
+    "weight": 234.0,
+    "uom": "EA",
+    "isActive": true,
+    "createdAt": "2025-10-19T10:41:44.877000",
+    "updatedAt": "2025-10-19T10:41:44.877000",
+    "metadata": {}
+  },
+  {
+    "_id": "68f4ccb600ad4390bd34760c",
+    "itemCode": "77",
+    "itemDescription": "hok",
+    "group": {
+      "code": "G3",
+      "subgroup": null,
+      "desc": null
+    },
+    "manufacturing": {
+      "location": "New York",
+      "line": null
+    },
+    "pricing": {
+      "avgPrice": 888.0,
+      "costPrice": 78.0,
+      "currency": "USD"
+    },
+    "weight": null,
+    "uom": "KG",
+    "isActive": false,
+    "createdAt": "2025-10-19T11:34:14.662000",
+    "updatedAt": "2025-10-19T11:37:40.996000",
+    "metadata": {}
+  }
+]

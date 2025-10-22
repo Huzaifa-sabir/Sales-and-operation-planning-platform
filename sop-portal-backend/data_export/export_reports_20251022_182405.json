@@ -1,0 +1,395 @@
+[
+  {
+    "_id": "68f7c3d5d4f924af51e20f8a",
+    "reportType": "sales_summary",
+    "format": "excel",
+    "status": "pending",
+    "cacheKey": "11f8f8c050f0e3fa0df6936dd295ce3e",
+    "filters": {},
+    "options": {},
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "test_user",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T17:33:09.040000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T17:33:09.040000",
+    "updatedAt": "2025-10-21T17:33:09.040000"
+  },
+  {
+    "_id": "68f7c7ae11ecef920d268c61",
+    "reportType": "sales_summary",
+    "format": "excel",
+    "status": "pending",
+    "cacheKey": "11f8f8c050f0e3fa0df6936dd295ce3e",
+    "filters": {},
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T17:49:34.108000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T17:49:34.109000",
+    "updatedAt": "2025-10-21T17:49:34.109000"
+  },
+  {
+    "_id": "68f7c9337f79183e59c764fa",
+    "reportType": "sales_summary",
+    "format": "excel",
+    "status": "pending",
+    "cacheKey": "11f8f8c050f0e3fa0df6936dd295ce3e",
+    "filters": {},
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T17:56:03.940000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T17:56:03.940000",
+    "updatedAt": "2025-10-21T17:56:03.940000"
+  },
+  {
+    "_id": "68f7ca1b4953ef4068890064",
+    "reportType": "sales_summary",
+    "format": "excel",
+    "status": "pending",
+    "cacheKey": "11f8f8c050f0e3fa0df6936dd295ce3e",
+    "filters": {},
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T17:59:55.785000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T17:59:55.785000",
+    "updatedAt": "2025-10-21T17:59:55.785000"
+  },
+  {
+    "_id": "68f7caa3e94f29f383fe71ed",
+    "reportType": "sales_summary",
+    "format": "excel",
+    "status": "pending",
+    "cacheKey": "c8e4381e0a5f7f3def8ea7d5440af3bb",
+    "filters": {
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:02:11.039000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:02:11.039000",
+    "updatedAt": "2025-10-21T18:02:11.039000"
+  },
+  {
+    "_id": "68f7cba0e94f29f383fe71ee",
+    "reportType": "sales_summary",
+    "format": "excel",
+    "status": "pending",
+    "cacheKey": "c8e4381e0a5f7f3def8ea7d5440af3bb",
+    "filters": {
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:06:24.738000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:06:24.738000",
+    "updatedAt": "2025-10-21T18:06:24.738000"
+  },
+  {
+    "_id": "68f7cba3e94f29f383fe71ef",
+    "reportType": "sales_summary",
+    "format": "pdf",
+    "status": "pending",
+    "cacheKey": "c8e4381e0a5f7f3def8ea7d5440af3bb",
+    "filters": {
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:06:27.575000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:06:27.575000",
+    "updatedAt": "2025-10-21T18:06:27.575000"
+  },
+  {
+    "_id": "68f7cbb0e94f29f383fe71f0",
+    "reportType": "sales_summary",
+    "format": "pdf",
+    "status": "pending",
+    "cacheKey": "c8e4381e0a5f7f3def8ea7d5440af3bb",
+    "filters": {
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:06:40.430000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:06:40.430000",
+    "updatedAt": "2025-10-21T18:06:40.430000"
+  },
+  {
+    "_id": "68f7cd263ba4696ee5b56444",
+    "reportType": "sales_summary",
+    "format": "pdf",
+    "status": "pending",
+    "cacheKey": "c8e4381e0a5f7f3def8ea7d5440af3bb",
+    "filters": {
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:12:54.703000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:12:54.703000",
+    "updatedAt": "2025-10-21T18:12:54.703000"
+  },
+  {
+    "_id": "68f7cd353ba4696ee5b56445",
+    "reportType": "sales_summary",
+    "format": "pdf",
+    "status": "pending",
+    "cacheKey": "3eec8af5807da2fb66a93cf3d079d930",
+    "filters": {
+      "customerId": "68f223cba2a7a8c0bacaf104",
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:13:09.098000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:13:09.098000",
+    "updatedAt": "2025-10-21T18:13:09.098000"
+  },
+  {
+    "_id": "68f7cd3c3ba4696ee5b56446",
+    "reportType": "sales_summary",
+    "format": "excel",
+    "status": "pending",
+    "cacheKey": "3eec8af5807da2fb66a93cf3d079d930",
+    "filters": {
+      "customerId": "68f223cba2a7a8c0bacaf104",
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:13:16.447000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:13:16.447000",
+    "updatedAt": "2025-10-21T18:13:16.447000"
+  },
+  {
+    "_id": "68f7cd453ba4696ee5b56447",
+    "reportType": "sales_summary",
+    "format": "pdf",
+    "status": "pending",
+    "cacheKey": "c8e4381e0a5f7f3def8ea7d5440af3bb",
+    "filters": {
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:13:25.584000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:13:25.584000",
+    "updatedAt": "2025-10-21T18:13:25.584000"
+  },
+  {
+    "_id": "68f7cfe692c62f2d7bd34885",
+    "reportType": "sales_summary",
+    "format": "pdf",
+    "status": "pending",
+    "cacheKey": "11f8f8c050f0e3fa0df6936dd295ce3e",
+    "filters": {},
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:24:38.369000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:24:38.369000",
+    "updatedAt": "2025-10-21T18:24:38.369000"
+  },
+  {
+    "_id": "68f7d00f92c62f2d7bd34886",
+    "reportType": "sales_summary",
+    "format": "pdf",
+    "status": "pending",
+    "cacheKey": "e8baadd7b8af938977382ecc8b402124",
+    "filters": {
+      "customerId": "68f223cba2a7a8c0bacaf104",
+      "productId": "68f223cba2a7a8c0bacaf10a",
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:25:19.706000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:25:19.706000",
+    "updatedAt": "2025-10-21T18:25:19.706000"
+  },
+  {
+    "_id": "68f7d02392c62f2d7bd34887",
+    "reportType": "sales_summary",
+    "format": "excel",
+    "status": "pending",
+    "cacheKey": "e8baadd7b8af938977382ecc8b402124",
+    "filters": {
+      "customerId": "68f223cba2a7a8c0bacaf104",
+      "productId": "68f223cba2a7a8c0bacaf10a",
+      "startDate": "2025-04-21T00:00:00",
+      "endDate": "2025-10-21T00:00:00"
+    },
+    "options": {
+      "includeCharts": true,
+      "includeRawData": false
+    },
+    "fileName": null,
+    "filePath": null,
+    "fileSize": null,
+    "downloadUrl": null,
+    "generatedBy": "68f223caa2a7a8c0bacaf101",
+    "generatedAt": null,
+    "expiresAt": "2025-10-28T18:25:39.966000",
+    "recordCount": null,
+    "processingTime": null,
+    "error": null,
+    "createdAt": "2025-10-21T18:25:39.966000",
+    "updatedAt": "2025-10-21T18:25:39.966000"
+  }
+]

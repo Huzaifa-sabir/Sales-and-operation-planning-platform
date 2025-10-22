@@ -17,12 +17,32 @@ class Database:
         """Connect to MongoDB database"""
         try:
             logger.info(f"Connecting to MongoDB at {settings.MONGODB_URL}")
-            cls.client = AsyncIOMotorClient(settings.MONGODB_URL)
+            
+            # Configure client with Railway-compatible SSL settings
+            import ssl
+            cls.client = AsyncIOMotorClient(
+                settings.MONGODB_URL,
+                tls=True,
+                tlsAllowInvalidCertificates=True,
+                serverSelectionTimeoutMS=30000,
+                connectTimeoutMS=30000,
+                socketTimeoutMS=30000
+            )
             cls.database = cls.client[settings.MONGODB_DB_NAME]
 
-            # Test connection
-            await cls.client.admin.command('ping')
-            logger.info(f"Successfully connected to MongoDB database: {settings.MONGODB_DB_NAME}")
+            # Test connection with retry logic
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    await cls.client.admin.command('ping')
+                    logger.info(f"Successfully connected to MongoDB database: {settings.MONGODB_DB_NAME}")
+                    break
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        raise e
+                    logger.warning(f"Connection attempt {attempt + 1} failed, retrying...")
+                    import asyncio
+                    await asyncio.sleep(2)
 
             # Create indexes
             await cls.create_indexes()

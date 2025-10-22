@@ -1,0 +1,236 @@
+[
+  {
+    "_id": "68f223cba2a7a8c0bacaf103",
+    "customerId": "PATITO-000001",
+    "customerName": "Industria Los Patitos, S.A.",
+    "sopCustomerName": "Los Patitos",
+    "salesRepId": "68f223cba2a7a8c0bacaf102",
+    "salesRepName": "David Brace",
+    "location": {
+      "city": "La Casona Del Cerdo",
+      "state": "HR",
+      "country": "Honduras"
+    },
+    "contactPerson": "Maria Rodriguez",
+    "contactEmail": "maria@lospatitos.hn",
+    "contactPhone": "+504-2234-5678",
+    "isActive": true,
+    "metadata": {
+      "totalSalesYTD": 125000.5
+    },
+    "createdAt": "2025-10-17T11:08:59.465000",
+    "updatedAt": "2025-10-17T11:08:59.465000",
+    "paymentTerms": "Net 30"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf104",
+    "customerId": "CANADA-000002",
+    "customerName": "Canadawide Fruit Wholesalers Inc.",
+    "sopCustomerName": "Canadawide",
+    "salesRepId": "68f223cba2a7a8c0bacaf102",
+    "salesRepName": "David Brace",
+    "location": {
+      "city": "Toronto",
+      "state": "ON",
+      "country": "Canada"
+    },
+    "contactPerson": "John Smith",
+    "contactEmail": "john@canadawide.ca",
+    "contactPhone": "+1-416-555-0100",
+    "isActive": true,
+    "metadata": {
+      "totalSalesYTD": 250000.0
+    },
+    "createdAt": "2025-10-17T11:08:59.465000",
+    "updatedAt": "2025-10-17T11:08:59.465000",
+    "paymentTerms": "Net 30"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf105",
+    "customerId": "AAORG-000003",
+    "customerName": "A&A Organic Farms Corp.",
+    "sopCustomerName": "A&A Organic",
+    "salesRepId": "68f223cba2a7a8c0bacaf102",
+    "salesRepName": "David Brace",
+    "location": {
+      "city": "Miami",
+      "state": "FL",
+      "country": "USA"
+    },
+    "contactPerson": "Alice Johnson",
+    "contactEmail": "alice@aaorganic.com",
+    "contactPhone": "+1-305-555-0200",
+    "isActive": true,
+    "metadata": {
+      "totalSalesYTD": 180000.75
+    },
+    "createdAt": "2025-10-17T11:08:59.465000",
+    "updatedAt": "2025-10-17T11:08:59.465000",
+    "paymentTerms": "Net 30"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf106",
+    "customerId": "MIAMI-000004",
+    "customerName": "Miami Wholesale Market",
+    "sopCustomerName": "Miami Wholesale",
+    "salesRepId": "68f223cba2a7a8c0bacaf102",
+    "salesRepName": "David Brace",
+    "location": {
+      "city": "Miami",
+      "state": "FL",
+      "country": "USA"
+    },
+    "contactPerson": "Carlos Garcia",
+    "contactEmail": "carlos@miamiwholesale.com",
+    "contactPhone": "+1-305-555-0300",
+    "isActive": true,
+    "metadata": {
+      "totalSalesYTD": 320000.0
+    },
+    "createdAt": "2025-10-17T11:08:59.465000",
+    "updatedAt": "2025-10-17T11:08:59.465000",
+    "paymentTerms": "Net 30"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf107",
+    "customerId": "FRESH-000005",
+    "customerName": "Fresh Produce Distributors",
+    "sopCustomerName": "Fresh Produce",
+    "salesRepId": "68f223cba2a7a8c0bacaf102",
+    "salesRepName": "David Brace",
+    "location": {
+      "city": "Los Angeles",
+      "state": "CA",
+      "country": "USA"
+    },
+    "contactPerson": "Sarah Lee",
+    "contactEmail": "sarah@freshproduce.com",
+    "contactPhone": "+1-213-555-0400",
+    "isActive": true,
+    "metadata": {
+      "totalSalesYTD": 210000.25
+    },
+    "createdAt": "2025-10-17T11:08:59.465000",
+    "updatedAt": "2025-10-17T11:08:59.465000",
+    "paymentTerms": "Net 30"
+  },
+  {
+    "_id": "68f223cba2a7a8c0bacaf108",
+    "customerId": "GARDEN-000006",
+    "customerName": "Garden Valley Foods",
+    "sopCustomerName": "Garden Valley",
+    "salesRepId": "68f223cba2a7a8c0bacaf102",
+    "salesRepName": "David Brace",
+    "location": {
+      "city": "Phoenix",
+      "state": "AZ",
+      "country": "USA"
+    },
+    "contactPerson": "Mike Davis",
+    "contactEmail": "mike@gardenvalley.com",
+    "contactPhone": "+1-602-555-0500",
+    "isActive": true,
+    "metadata": {
+      "totalSalesYTD": 145000.0
+    },
+    "createdAt": "2025-10-17T11:08:59.465000",
+    "updatedAt": "2025-10-17T11:08:59.465000",
+    "paymentTerms": "Net 30"
+  },
+  {
+    "_id": "68f40c2e3ba93a56927f0638",
+    "customerId": "TEST-001",
+    "customerName": "Test Customer",
+    "sopCustomerName": null,
+    "salesRepId": "default-rep",
+    "salesRepName": "Default Sales Rep",
+    "location": {
+      "address": "123 Test St",
+      "city": "Test City",
+      "state": "TS",
+      "zipCode": "12345",
+      "country": "USA"
+    },
+    "contactPerson": "Test Person",
+    "contactEmail": null,
+    "contactPhone": null,
+    "paymentTerms": null,
+    "creditLimit": null,
+    "isActive": true,
+    "createdAt": "2025-10-18T21:52:46.917000",
+    "updatedAt": "2025-10-18T21:52:46.917000",
+    "metadata": {}
+  },
+  {
+    "_id": "68f40dc3af149842280c2a5f",
+    "customerId": "453523",
+    "customerName": "huzaifa11",
+    "sopCustomerName": "huzaifa11",
+    "salesRepId": "default-rep",
+    "salesRepName": "Default Sales Rep",
+    "location": {
+      "address": "ert",
+      "city": "ty",
+      "state": "CO",
+      "zipCode": "89677",
+      "country": "USA"
+    },
+    "contactPerson": "4534",
+    "contactEmail": null,
+    "contactPhone": null,
+    "paymentTerms": null,
+    "creditLimit": null,
+    "isActive": true,
+    "createdAt": "2025-10-18T21:59:31.630000",
+    "updatedAt": "2025-10-18T21:59:31.630000",
+    "metadata": {}
+  },
+  {
+    "_id": "68f40e06af149842280c2a60",
+    "customerId": "w34",
+    "customerName": "huzaifa1144",
+    "sopCustomerName": "huzaifa1144",
+    "salesRepId": "default-rep",
+    "salesRepName": "Default Sales Rep",
+    "location": {
+      "address": "ert",
+      "city": "ty",
+      "state": "AR",
+      "zipCode": "89677",
+      "country": "USA"
+    },
+    "contactPerson": "wr3",
+    "contactEmail": null,
+    "contactPhone": null,
+    "paymentTerms": null,
+    "creditLimit": null,
+    "isActive": false,
+    "createdAt": "2025-10-18T22:00:38.659000",
+    "updatedAt": "2025-10-18T22:09:10.539000",
+    "metadata": {}
+  },
+  {
+    "_id": "68f40feba7f4ddac94cbab5d",
+    "customerId": "452",
+    "customerName": "huzaifa1144",
+    "sopCustomerName": "huzaifa1144",
+    "salesRepId": "default-rep",
+    "salesRepName": "Default Sales Rep",
+    "location": {
+      "address": "ert",
+      "city": "ty",
+      "state": "CT",
+      "zipCode": "89677",
+      "country": "USA"
+    },
+    "contactPerson": "242resf",
+    "contactEmail": null,
+    "contactPhone": null,
+    "paymentTerms": null,
+    "creditLimit": null,
+    "isActive": false,
+    "createdAt": "2025-10-18T22:08:43.197000",
+    "updatedAt": "2025-10-19T11:32:52.971000",
+    "metadata": {}
+  }
+]

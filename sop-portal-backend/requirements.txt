@@ -45,3 +45,7 @@ fastapi-cors==0.0.6
 
 # Additional dependencies for Railway
 gunicorn==21.2.0
+
+# SSL/TLS dependencies for Railway
+certifi==2023.11.17
+urllib3==2.1.0
