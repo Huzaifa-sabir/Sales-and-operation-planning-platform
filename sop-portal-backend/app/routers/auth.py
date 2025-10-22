@@ -21,18 +21,6 @@ from app.utils.auth_dependencies import get_current_active_user
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.options("/login")
-async def login_options():
-    """Handle CORS preflight requests for login endpoint"""
-    from fastapi import Response
-    response = Response()
-    response.headers["Access-Control-Allow-Origin"] = "https://soptest.netlify.app"
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    return response
-
-
 @router.post("/login", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 async def login(
     credentials: LoginRequest,
