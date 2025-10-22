@@ -30,7 +30,7 @@ import { cyclesAPI } from '@/api/cycles';
 import { customersAPI } from '@/api/customers';
 import { productsAPI } from '@/api/products';
 import { forecastsAPI } from '@/api/forecasts';
-import type { ForecastCreate, ForecastMonthData } from '@/api/forecasts';
+// import type { ForecastCreate, ForecastMonthData } from '@/api/forecasts';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Form, Input, Select, Switch, Row, Col, message } from 'antd';
+import { Form, Input, Select, Row, Col } from 'antd';
 import type { Customer, CustomerFormData } from '@/types';
 import { US_STATES } from '@/config/constants';
 

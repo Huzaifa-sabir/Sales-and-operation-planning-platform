@@ -8,7 +8,6 @@ import {
   Button,
   Space,
   Typography,
-  Divider,
   message,
   Row,
   Col,
@@ -29,7 +28,7 @@ import {
 import { settingsAPI, type Setting } from '@/api/settings';
 
 const { Title, Text, Paragraph } = Typography;
-const { TextArea } = Input;
+// const { TextArea } = Input;
 
 interface SystemSettings {
   // General Settings

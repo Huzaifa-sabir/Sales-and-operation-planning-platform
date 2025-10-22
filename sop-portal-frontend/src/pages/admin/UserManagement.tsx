@@ -17,7 +17,6 @@ import {
   Col,
   Statistic,
   Avatar,
-  Alert,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -29,21 +28,19 @@ import {
   MailOutlined,
   CheckCircleOutlined,
   StopOutlined,
-  CopyOutlined,
 } from '@ant-design/icons';
 import type { User } from '@/types';
-import { usersAPI, type UserCreate, type UserUpdate } from '@/api/users';
-import { getErrorMessage } from '@/api/axios';
+import { usersAPI } from '@/api/users';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
-interface UserFormData {
-  username: string;
-  email: string;
-  fullName: string;
-  role: 'admin' | 'sales_rep';
-}
+// interface UserFormData {
+//   username: string;
+//   email: string;
+//   fullName: string;
+//   role: 'admin' | 'sales_rep';
+// }
 
 export default function UserManagement() {
   const [form] = Form.useForm();
@@ -145,13 +142,13 @@ export default function UserManagement() {
       title: 'Territory',
       key: 'territory',
       width: 150,
-      render: (_, record) => record.metadata?.territory || '-',
+      render: (_, record) => (record as any).metadata?.territory || '-',
     },
     {
       title: 'Phone',
       key: 'phone',
       width: 150,
-      render: (_, record) => record.metadata?.phone || '-',
+      render: (_, record) => (record as any).metadata?.phone || '-',
     },
     {
       title: 'Status',
@@ -233,8 +230,8 @@ export default function UserManagement() {
       fullName: user.fullName,
       role: user.role,
       isActive: user.isActive,
-      territory: user.metadata?.territory,
-      phone: user.metadata?.phone,
+      territory: (user as any).metadata?.territory,
+      phone: (user as any).metadata?.phone,
     });
     setIsModalOpen(true);
   };
@@ -296,7 +293,7 @@ export default function UserManagement() {
 
       setIsModalOpen(false);
       form.resetFields();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving user:', error);
       
       // Handle specific error cases
@@ -321,16 +318,16 @@ export default function UserManagement() {
     }
   };
 
-  const handleToggleStatus = async (userId: string) => {
-    try {
-      const updatedUser = await usersAPI.toggleStatus(userId);
-      setUsers(users.map((u) => (u._id === userId ? updatedUser : u)));
-      message.success(`${updatedUser.fullName} ${updatedUser.isActive ? 'activated' : 'deactivated'}`);
-    } catch (error) {
-      message.error('Failed to update user status');
-      console.error('Error updating user status:', error);
-    }
-  };
+  // const handleToggleStatus = async (userId: string) => {
+  //   try {
+  //     const updatedUser = await usersAPI.toggleStatus(userId);
+  //     setUsers(users.map((u) => (u._id === userId ? updatedUser : u)));
+  //     message.success(`${updatedUser.fullName} ${updatedUser.isActive ? 'activated' : 'deactivated'}`);
+  //   } catch (error) {
+  //     message.error('Failed to update user status');
+  //     console.error('Error updating user status:', error);
+  //   }
+  // };
 
   return (
     <div>

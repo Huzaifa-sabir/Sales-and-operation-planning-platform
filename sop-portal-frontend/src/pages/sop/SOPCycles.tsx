@@ -36,7 +36,7 @@ import dayjs from 'dayjs';
 const { Title, Text } = Typography;
 
 // Mock S&OP Cycles data
-const mockCycles: SOPCycle[] = [
+// const mockCycles: SOPCycle[] = [
   {
     _id: '1',
     cycleName: 'November 2025',
@@ -110,7 +110,7 @@ const mockCycles: SOPCycle[] = [
     createdAt: '2025-10-25T00:00:00Z',
     updatedAt: '2025-10-25T00:00:00Z',
   },
-];
+// ];
 
 export default function SOPCycles() {
   const [form] = Form.useForm();

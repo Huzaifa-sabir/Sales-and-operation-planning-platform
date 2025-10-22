@@ -1,5 +1,5 @@
 import axiosInstance from './axios';
-import type { Customer, CustomerFormData, PaginatedResponse, TableFilters } from '@/types';
+import type { Customer, CustomerFormData, TableFilters } from '@/types';
 
 export const customersAPI = {
   // Get all customers with filters

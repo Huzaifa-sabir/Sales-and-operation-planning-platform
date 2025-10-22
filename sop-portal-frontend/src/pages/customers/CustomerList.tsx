@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Table,
   Button,
@@ -16,7 +16,6 @@ import {
   Row,
   Col,
   Statistic,
-  Spin,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -36,7 +35,7 @@ import CustomerForm from '@/components/forms/CustomerForm';
 const { Title } = Typography;
 
 // Mock data based on your Excel files
-const mockCustomers: Customer[] = [
+// const mockCustomers: Customer[] = [
   {
     _id: '1',
     customerId: 'PATITO-000001',
@@ -154,7 +153,7 @@ const mockCustomers: Customer[] = [
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-10-15T00:00:00Z',
   },
-];
+// ];
 
 export default function CustomerList() {
   const queryClient = useQueryClient();
@@ -228,7 +227,7 @@ export default function CustomerList() {
   };
 
   const handleSalesRepFilter = (value: string) => {
-    setFilters(prev => ({ ...prev, salesRepId: value, page: 1 }));
+    setFilters(prev => ({ ...prev, salesRepId: value as string, page: 1 }));
   };
 
   // Backend handles filtering, no need for client-side filtering
@@ -364,7 +363,7 @@ export default function CustomerList() {
             location: {
               city: values.city,
               state: values.state,
-              address: values.address1, // Map address1 to address
+              address1: values.address1, // Map address1 to address1
               zipCode: values.zip, // Map zip to zipCode
               country: 'USA', // Default country
             },
@@ -379,14 +378,14 @@ export default function CustomerList() {
           location: {
             city: values.city,
             state: values.state,
-            address: values.address1, // Map address1 to address
+            address1: values.address1, // Map address1 to address1
             zipCode: values.zip, // Map zip to zipCode
             country: 'USA', // Default country
           },
           contactPerson: values.corporateGroup, // Map corporateGroup to contactPerson for now
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Form validation failed:', error);
     }
   };

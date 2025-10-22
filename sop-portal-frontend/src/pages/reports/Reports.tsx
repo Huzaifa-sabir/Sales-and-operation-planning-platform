@@ -154,17 +154,17 @@ const reportTemplates: ReportTemplate[] = [
   },
 ];
 
-const mockCustomers = [
+// const mockCustomers = [
   { label: 'Industria Los Patitos', value: '1' },
   { label: 'Canadawide', value: '2' },
   { label: 'A&A Organic', value: '3' },
-];
+// ];
 
-const mockProducts = [
+// const mockProducts = [
   { label: '110001 - Peeled Garlic 12x1 LB', value: '1' },
   { label: '110002 - Peeled Garlic 12x3 LB', value: '2' },
   { label: '130030 - Garlic Puree 40 LB', value: '3' },
-];
+// ];
 
 const mockSalesReps = [
   { label: 'David Brace', value: '1' },
@@ -172,11 +172,11 @@ const mockSalesReps = [
   { label: 'Sarah Johnson', value: '3' },
 ];
 
-const mockCycles = [
+// const mockCycles = [
   { label: 'November 2025', value: '1' },
   { label: 'October 2025', value: '2' },
   { label: 'December 2025', value: '3' },
-];
+// ];
 
 const getCategoryColor = (category: string) => {
   switch (category) {
@@ -222,8 +222,8 @@ export default function Reports() {
     setLoading(true);
     try {
       // Load cycles
-      const cyclesResponse = await cyclesAPI.list({ page: 1, limit: 100 });
-      setCycles(cyclesResponse.cycles.map(c => ({ label: c.cycleName, value: c._id })));
+      const cyclesResponse = await cyclesAPI.list({ limit: 100 });
+      setCycles(cyclesResponse.data.map((c: any) => ({ label: c.cycleName, value: c._id })));
 
       // Load customers
       const customersResponse = await customersAPI.getAll({ page: 1, limit: 100 });
