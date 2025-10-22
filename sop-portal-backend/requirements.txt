@@ -41,3 +41,7 @@ python-dateutil==2.9.0.post0
 APScheduler==3.10.4
 
 # CORS
+fastapi-cors==0.0.6
+
+# Additional dependencies for Railway
+gunicorn==21.2.0
