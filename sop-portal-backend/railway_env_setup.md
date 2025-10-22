@@ -6,7 +6,7 @@ Go to your Railway project dashboard → Variables tab and add these:
 
 ### Database Configuration
 ```
-MONGODB_URL=mongodb+srv://huzaifasabir289_db_user:4SLjzoPzm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE
+MONGODB_URL=mongodb+srv://huzaifasabir289_db_user:4SLjzoPzm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority
 MONGODB_DB_NAME=sop_portal
 ```
 

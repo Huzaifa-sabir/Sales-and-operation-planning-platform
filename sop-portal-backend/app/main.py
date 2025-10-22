@@ -5,6 +5,7 @@ import logging
 
 from app.config.settings import settings
 from app.config.database import db
+from app.config.railway_database import railway_db
 from app.config.indexes import create_performance_indexes
 from app.services.settings_service import SettingsService
 from app.utils.scheduler import BackgroundScheduler
@@ -29,9 +30,15 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
 
-    # Connect to database
-    await db.connect_db()
-    database = db.get_database()
+    # Connect to database (use Railway database for production)
+    try:
+        await railway_db.connect_db()
+        database = railway_db.get_database()
+        logger.info("Using Railway-optimized database connection")
+    except Exception as e:
+        logger.warning(f"Railway database connection failed, falling back to standard: {e}")
+        await db.connect_db()
+        database = db.get_database()
 
     # Create performance indexes
     logger.info("Creating database indexes...")
@@ -56,7 +63,14 @@ async def lifespan(app: FastAPI):
     if scheduler:
         scheduler.shutdown()
 
-    await db.close_db()
+    try:
+        await railway_db.close_db()
+    except:
+        pass
+    try:
+        await db.close_db()
+    except:
+        pass
 
 
 # Create FastAPI application

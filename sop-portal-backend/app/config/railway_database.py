@@ -1,27 +1,35 @@
+"""
+Railway-specific database configuration for MongoDB Atlas
+"""
+import os
+import ssl
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from typing import Optional
-from app.config.settings import settings
 import logging
 
 logger = logging.getLogger(__name__)
 
-
-class Database:
-    """MongoDB database connection manager"""
+class RailwayDatabase:
+    """Railway-optimized MongoDB database connection manager"""
 
     client: Optional[AsyncIOMotorClient] = None
     database: Optional[AsyncIOMotorDatabase] = None
 
     @classmethod
     async def connect_db(cls):
-        """Connect to MongoDB database"""
+        """Connect to MongoDB database with Railway-specific configuration"""
         try:
-            logger.info(f"Connecting to MongoDB at {settings.MONGODB_URL}")
+            # Get connection string from environment or use default
+            mongodb_url = os.getenv(
+                "MONGODB_URL", 
+                "mongodb+srv://huzaifasabir289_db_user:4SLjzoPzm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
+            )
             
-            # Configure client with Railway-compatible SSL settings
-            import ssl
+            logger.info(f"Connecting to MongoDB at {mongodb_url}")
+            
+            # Railway-specific SSL configuration
             cls.client = AsyncIOMotorClient(
-                settings.MONGODB_URL,
+                mongodb_url,
                 tls=True,
                 tlsAllowInvalidCertificates=True,
                 tlsAllowInvalidHostnames=True,
@@ -31,23 +39,28 @@ class Database:
                 retryWrites=True,
                 retryReads=True,
                 maxPoolSize=10,
-                minPoolSize=1
+                minPoolSize=1,
+                heartbeatFrequencyMS=10000,
+                maxIdleTimeMS=30000
             )
-            cls.database = cls.client[settings.MONGODB_DB_NAME]
+            
+            db_name = os.getenv("MONGODB_DB_NAME", "sop_portal")
+            cls.database = cls.client[db_name]
 
-            # Test connection with retry logic
-            max_retries = 3
+            # Test connection with extended retry logic
+            max_retries = 5
             for attempt in range(max_retries):
                 try:
                     await cls.client.admin.command('ping')
-                    logger.info(f"Successfully connected to MongoDB database: {settings.MONGODB_DB_NAME}")
+                    logger.info(f"Successfully connected to MongoDB database: {db_name}")
                     break
                 except Exception as e:
                     if attempt == max_retries - 1:
+                        logger.error(f"Final connection attempt failed: {e}")
                         raise e
-                    logger.warning(f"Connection attempt {attempt + 1} failed, retrying...")
+                    logger.warning(f"Connection attempt {attempt + 1} failed, retrying in 5 seconds...")
                     import asyncio
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(5)
 
             # Create indexes
             await cls.create_indexes()
@@ -118,12 +131,5 @@ class Database:
         except Exception as e:
             logger.warning(f"Error creating indexes: {e}")
 
-
 # Global database instance
-db = Database()
-
-
-# Dependency for FastAPI routes
-async def get_db() -> AsyncIOMotorDatabase:
-    """Dependency to get database in route handlers"""
-    return db.get_database()
+railway_db = RailwayDatabase()
