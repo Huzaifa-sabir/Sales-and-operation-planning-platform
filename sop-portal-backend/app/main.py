@@ -30,15 +30,16 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
 
-    # Connect to database (use Railway database for production)
+    # Connect to database (use standard database for Render)
     try:
+        await db.connect_db()
+        database = db.get_database()
+        logger.info("Using standard database connection")
+    except Exception as e:
+        logger.warning(f"Standard database connection failed, trying Railway: {e}")
         await railway_db.connect_db()
         database = railway_db.get_database()
         logger.info("Using Railway-optimized database connection")
-    except Exception as e:
-        logger.warning(f"Railway database connection failed, falling back to standard: {e}")
-        await db.connect_db()
-        database = db.get_database()
 
     # Create performance indexes
     logger.info("Creating database indexes...")
