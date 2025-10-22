@@ -247,7 +247,7 @@ export default function CustomerList() {
               address1: values.address1, // Map address1 to address1
               zip: values.zip, // Map zip to zip
             },
-            contactPerson: values.corporateGroup, // Map corporateGroup to contactPerson for now
+            corporateGroup: values.corporateGroup, // Map corporateGroup to corporateGroup
           },
         });
       } else {
