@@ -246,7 +246,6 @@ export default function CustomerList() {
               state: values.state,
               address1: values.address1, // Map address1 to address1
               zip: values.zip, // Map zip to zip
-              country: 'USA', // Default country
             },
             contactPerson: values.corporateGroup, // Map corporateGroup to contactPerson for now
           },
