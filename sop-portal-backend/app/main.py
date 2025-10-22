@@ -95,8 +95,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add rate limiting middleware
-app.add_middleware(RateLimiterMiddleware, requests_per_minute=60)
+# Add rate limiting middleware (temporarily disabled for CORS testing)
+# app.add_middleware(RateLimiterMiddleware, requests_per_minute=60)
 
 
 # Root endpoint
