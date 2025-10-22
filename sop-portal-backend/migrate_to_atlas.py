@@ -16,7 +16,7 @@ LOCAL_MONGODB_URL = "mongodb://localhost:27017"
 LOCAL_DB_NAME = "sop_portal"
 
 # MongoDB Atlas connection
-ATLAS_MONGODB_URL = "mongodb+srv://huzaifasabir289_db_user:4SLjzoPzm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
+ATLAS_MONGODB_URL = "mongodb+srv://huzaifasabir289_db_user:4SLjzoPgm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
 ATLAS_DB_NAME = "sop_portal"
 
 # Collections to migrate

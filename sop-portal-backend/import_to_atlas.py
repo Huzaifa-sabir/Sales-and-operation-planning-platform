@@ -10,7 +10,7 @@ from pymongo import MongoClient
 from typing import Dict, List, Any
 
 # MongoDB Atlas connection
-ATLAS_MONGODB_URL = "mongodb+srv://huzaifasabir289_db_user:4SLjzoPzm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
+ATLAS_MONGODB_URL = "mongodb+srv://huzaifasabir289_db_user:4SLjzoPgm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
 ATLAS_DB_NAME = "sop_portal"
 
 def import_json_file(filepath: str, collection_name: str):

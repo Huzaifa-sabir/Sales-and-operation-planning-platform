@@ -22,7 +22,7 @@ class RailwayDatabase:
             # Get connection string from environment or use default
             mongodb_url = os.getenv(
                 "MONGODB_URL", 
-                "mongodb+srv://huzaifasabir289_db_user:4SLjzoPzm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
+                "mongodb+srv://huzaifasabir289_db_user:4SLjzoPgm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
             )
             
             logger.info(f"Connecting to MongoDB at {mongodb_url}")
