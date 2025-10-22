@@ -154,17 +154,9 @@ const reportTemplates: ReportTemplate[] = [
   },
 ];
 
-// const mockCustomers = [
-  { label: 'Industria Los Patitos', value: '1' },
-  { label: 'Canadawide', value: '2' },
-  { label: 'A&A Organic', value: '3' },
-// ];
+// Mock data removed for production build
 
-// const mockProducts = [
-  { label: '110001 - Peeled Garlic 12x1 LB', value: '1' },
-  { label: '110002 - Peeled Garlic 12x3 LB', value: '2' },
-  { label: '130030 - Garlic Puree 40 LB', value: '3' },
-// ];
+// Mock data removed for production build
 
 const mockSalesReps = [
   { label: 'David Brace', value: '1' },
@@ -172,11 +164,7 @@ const mockSalesReps = [
   { label: 'Sarah Johnson', value: '3' },
 ];
 
-// const mockCycles = [
-  { label: 'November 2025', value: '1' },
-  { label: 'October 2025', value: '2' },
-  { label: 'December 2025', value: '3' },
-// ];
+// Mock data removed for production build
 
 const getCategoryColor = (category: string) => {
   switch (category) {
