@@ -1,0 +1,117 @@
+Backend Development & Integration - 10 Step Plan
+Step 1: Backend Project Setup & Environment Configuration
+Initialize Python FastAPI project structure
+Set up virtual environment and install dependencies (FastAPI, Motor/PyMongo, Pydantic, python-jose for JWT, passlib for password hashing, python-multipart for file uploads)
+Configure MongoDB connection (local or Atlas)
+Set up environment variables (.env file) for database URL, JWT secret, SMTP credentials, etc.
+Create basic project structure: routers, models, services, utils, config folders
+Set up CORS middleware to allow frontend (localhost:5173) to communicate
+Step 2: Database Schema & Models
+Create Pydantic models for all entities (User, Customer, Product, SalesHistory, SOPCycle, Forecast, etc.)
+Define MongoDB collections and indexes as per MONGODB_SCHEMA.md
+Create database initialization scripts
+Set up database connection pooling
+Create utility functions for database operations (connect, disconnect, get_database)
+Add seed data scripts for initial admin user and test data
+Step 3: Authentication & Authorization System
+Implement JWT token generation and validation
+Create password hashing utilities (bcrypt)
+Build authentication endpoints: /login, /logout, /me (get current user)
+Implement token refresh mechanism
+Create authentication dependency for protected routes
+Build role-based access control (RBAC) decorator/middleware for admin-only routes
+Add login attempt tracking and account lockout after max attempts
+Step 4: User Management API
+Build CRUD endpoints for users (/api/v1/users)
+Implement user creation with email validation and password generation
+Add user update, delete, and status toggle endpoints
+Create password reset functionality (generate reset token, send email)
+Add user search and filtering by role/status
+Implement pagination for user lists
+Add validation to prevent deleting the last admin user
+Step 5: Customer & Product Master Data APIs
+Build Customer CRUD endpoints (/api/v1/customers)
+Build Product CRUD endpoints (/api/v1/products)
+Implement search, filter, and pagination for both
+Add validation rules (unique customer IDs, item codes)
+Create Product-Customer Matrix management (which products each customer can order)
+Address client feedback: Implement logic to return only customer-specific products when filtering
+Add customer-specific pricing storage and retrieval
+Implement soft delete (isActive flag) instead of hard delete
+Step 6: Excel Import/Export Functionality
+Install openpyxl or pandas for Excel handling
+Create Excel template generators for customers, products, and forecasts
+Build import endpoints that accept Excel files, validate data, and bulk insert
+Handle import errors gracefully (return row-by-row error reports)
+Build export endpoints that generate Excel files from database data
+Add data formatting for Excel (dates, currency, proper column headers)
+Store uploaded files temporarily and clean up after processing
+Step 7: Sales History & S&OP Cycle Management APIs
+Build Sales History endpoints (GET with filters by customer, product, date range)
+Implement aggregation pipelines for sales statistics and charts data
+Build S&OP Cycle CRUD endpoints (/api/v1/sop/cycles)
+Add cycle-specific actions: Open cycle, Close cycle (with validations)
+Implement automatic 16-month planning period calculation
+Create cycle status management (draft → open → closed workflow)
+Add notification triggers when cycle opens/closes
+Track submission statistics per cycle (how many reps submitted)
+Step 8: Forecast Entry & Submission System
+Build forecast endpoints: GET (retrieve existing), POST (save draft), PUT (update)
+Create forecast submission endpoint with validation (mandatory 12 months check)
+Address client feedback: Implement price handling - fetch customer-specific prices or allow override
+Store forecast data efficiently (monthly breakdown for 16 months)
+Track forecast versions (draft vs submitted)
+Prevent editing after submission (or implement revision workflow)
+Calculate forecast totals and statistics automatically
+Link forecasts to active S&OP cycle
+Add bulk forecast entry via Excel import
+Step 9: Reports & Analytics System
+Build report generation endpoints (/api/v1/reports/generate)
+Implement each report type with MongoDB aggregation pipelines:
+Sales Summary (trends, totals, breakdowns)
+Forecast vs Actual (variance analysis)
+Customer Performance (rankings, accuracy)
+Product Analysis (volumes, profitability)
+Cycle Submission Status
+Gross Profit Analysis
+Forecast Accuracy
+Monthly Dashboard (KPIs)
+Create Excel report generators with proper formatting and charts
+Add PDF generation (using ReportLab or similar)
+Implement report scheduling and caching for performance
+Store generated reports with download links
+Add Power BI data export endpoint (JSON format)
+Step 10: System Settings, Notifications & Final Integration
+Build settings CRUD endpoints (/api/v1/settings)
+Implement email notification system using SMTP
+Create notification templates (cycle opened, deadline reminder, submission received)
+Add background task scheduler for:
+Sending reminders X days before cycle close
+Auto-closing cycles after deadline (if enabled)
+Cleaning up old temporary files
+Build audit logging for critical actions (user changes, forecast submissions, cycle changes)
+Final Frontend Integration:
+Replace all mock data with actual API calls in frontend
+Test all CRUD operations end-to-end
+Verify role-based access works correctly
+Test file uploads/downloads
+Verify email notifications are sent
+Test error handling and loading states
+Performance optimization (add database indexes, caching, query optimization)
+Security hardening (rate limiting, input sanitization, SQL injection prevention)
+Add API documentation with Swagger/OpenAPI (auto-generated by FastAPI)
+Additional Considerations Throughout:
+Error handling and consistent error response format
+Request validation with Pydantic models
+Logging for debugging and monitoring
+Unit tests for critical business logic
+API versioning (/api/v1/)
+Rate limiting to prevent abuse
+Data backup strategy
+Environment-specific configs (dev, staging, production)
+This approach ensures:
+Authentication is done first (needed for all protected routes)
+Master data (users, customers, products) before transactional data
+Core S&OP functionality before advanced features
+Integration happens at the end when backend is stable
+Client feedback points are addressed in relevant steps

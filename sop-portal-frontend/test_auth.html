@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Auth</title>
+</head>
+<body>
+    <h1>Test Authentication</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="testProducts()">Test Products</button>
+    <div id="output"></div>
+
+    <script>
+        async function testLogin() {
+            const output = document.getElementById('output');
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@heavygarlic.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                output.innerHTML = `<p>Login Status: ${response.status}</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+                if (response.ok) {
+                    localStorage.setItem('sop_token', data.access_token);
+                    localStorage.setItem('sop_user', JSON.stringify(data.user));
+                }
+            } catch (error) {
+                output.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testProducts() {
+            const output = document.getElementById('output');
+            const token = localStorage.getItem('sop_token');
+            
+            if (!token) {
+                output.innerHTML = '<p>No token found. Please login first.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/products?page=1&limit=100&isActive=true', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                output.innerHTML = `<p>Products Status: ${response.status}</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                output.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

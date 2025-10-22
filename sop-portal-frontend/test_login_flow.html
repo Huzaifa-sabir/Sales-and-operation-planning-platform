@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login Flow</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .step { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { margin: 5px; padding: 10px; }
+        pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test Login Flow</h1>
+    
+    <div class="step">
+        <h3>Step 1: Test Login</h3>
+        <button onclick="testLogin()">Login</button>
+        <div id="login-result"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 2: Check Token</h3>
+        <button onclick="checkToken()">Check Token</button>
+        <div id="token-result"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 3: Test Products API</h3>
+        <button onclick="testProducts()">Test Products</button>
+        <div id="products-result"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 4: Test Forecast Entry</h3>
+        <button onclick="testForecastEntry()">Test Forecast Entry</button>
+        <div id="forecast-result"></div>
+    </div>
+
+    <script>
+        async function testLogin() {
+            const result = document.getElementById('login-result');
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@heavygarlic.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('sop_access_token', data.access_token);
+                    localStorage.setItem('sop_user', JSON.stringify(data.user));
+                    result.innerHTML = `<div class="success">✅ Login successful! Token saved.</div>`;
+                } else {
+                    result.innerHTML = `<div class="error">❌ Login failed: ${data.detail}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function checkToken() {
+            const result = document.getElementById('token-result');
+            const token = localStorage.getItem('sop_access_token');
+            const user = localStorage.getItem('sop_user');
+            
+            if (token && user) {
+                const userData = JSON.parse(user);
+                result.innerHTML = `
+                    <div class="success">
+                        ✅ Token found: ${token.substring(0, 20)}...<br>
+                        User: ${userData.username} (${userData.role})
+                    </div>
+                `;
+            } else {
+                result.innerHTML = `<div class="error">❌ No token found. Please login first.</div>`;
+            }
+        }
+
+        async function testProducts() {
+            const result = document.getElementById('products-result');
+            const token = localStorage.getItem('sop_access_token');
+            
+            if (!token) {
+                result.innerHTML = `<div class="error">❌ No token found. Please login first.</div>`;
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/products?page=1&limit=100&isActive=true', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `
+                        <div class="success">
+                            ✅ Products API successful!<br>
+                            Products: ${data.products.length}<br>
+                            Total: ${data.total}
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `<div class="error">❌ Products API failed: ${data.detail}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testForecastEntry() {
+            const result = document.getElementById('forecast-result');
+            const token = localStorage.getItem('sop_access_token');
+            
+            if (!token) {
+                result.innerHTML = `<div class="error">❌ No token found. Please login first.</div>`;
+                return;
+            }
+
+            try {
+                // Test getting active cycle
+                const cycleResponse = await fetch('http://localhost:8000/api/v1/sop/cycles/active', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (cycleResponse.ok) {
+                    const cycleData = await cycleResponse.json();
+                    result.innerHTML = `
+                        <div class="success">
+                            ✅ Forecast Entry should work!<br>
+                            Active Cycle: ${cycleData.cycleName}<br>
+                            Status: ${cycleData.status}
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `<div class="error">❌ No active cycle found. Please create one first.</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

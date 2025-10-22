@@ -1,0 +1,109 @@
+================================================================================
+             S&OP PORTAL - QUICK START GUIDE
+================================================================================
+
+🚀 ONE-CLICK START
+================================================================================
+
+Just double-click:  start-sop-portal.bat
+
+That's it! It will:
+  ✓ Start MongoDB
+  ✓ Start Backend API
+  ✓ Start Frontend
+  ✓ Open your browser
+
+================================================================================
+🔑 DEFAULT LOGIN
+================================================================================
+
+Email:    admin@heavygarlic.com
+Password: admin123
+
+⚠️ IMPORTANT: Change these after first login!
+
+================================================================================
+🌐 URLS
+================================================================================
+
+Frontend:     http://localhost:5173
+Backend API:  http://localhost:8000
+API Docs:     http://localhost:8000/api/docs
+MongoDB:      mongodb://localhost:27017
+
+================================================================================
+📋 AVAILABLE SCRIPTS
+================================================================================
+
+start-sop-portal.bat    → Start all services
+stop-sop-portal.bat     → Stop all services
+status-sop-portal.bat   → Check status & control
+
+================================================================================
+✅ TEST CHECKLIST
+================================================================================
+
+After starting, test these:
+
+[ ] Login works
+[ ] Dashboard loads
+[ ] Create S&OP Cycle
+[ ] Open cycle
+[ ] View customers
+[ ] View products
+[ ] Create forecast
+[ ] Submit forecast
+[ ] Generate report
+
+================================================================================
+🔧 TROUBLESHOOTING
+================================================================================
+
+MongoDB won't start?
+  → Check if port 27017 is free
+  → Run: netstat -ano | findstr ":27017"
+
+Backend won't start?
+  → Check if port 8000 is free
+  → Check if Python venv exists
+
+Frontend won't start?
+  → Delete node_modules\.vite folder
+  → Run: npm install
+
+Need to restart?
+  1. Run: stop-sop-portal.bat
+  2. Wait 5 seconds
+  3. Run: start-sop-portal.bat
+
+================================================================================
+📚 DOCUMENTATION
+================================================================================
+
+All docs in D:\Heavy\:
+
+- README.md
+- PROJECT_SUMMARY.md
+- API_ENDPOINTS.md
+- MONGODB_SCHEMA.md
+- DEPLOYMENT_GUIDE.md
+
+================================================================================
+🆘 QUICK COMMANDS
+================================================================================
+
+Check status:
+  status-sop-portal.bat
+
+View logs:
+  Check the 3 command windows that opened
+
+Restart everything:
+  stop-sop-portal.bat
+  start-sop-portal.bat
+
+================================================================================
+
+Ready? Just run:  start-sop-portal.bat
+
+================================================================================
