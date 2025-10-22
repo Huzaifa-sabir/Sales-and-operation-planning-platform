@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     PORT: int = 8000
 
     # Database
-    MONGODB_URL: str = "mongodb+srv://huzaifasabir289_db_user:4SLjzoPgm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
+    MONGODB_URL: str = "mongodb+srv://huzaifasabir289_db_user:4SLjzoPzm00pQNNv@cluster0.4owv6bf.mongodb.net/sop_portal?retryWrites=true&w=majority"
     MONGODB_DB_NAME: str = "sop_portal"
 
     # JWT
