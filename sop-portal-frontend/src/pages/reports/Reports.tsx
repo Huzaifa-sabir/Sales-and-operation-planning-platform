@@ -209,40 +209,52 @@ export default function Reports() {
   const loadData = async () => {
     setLoading(true);
     try {
-      // Load cycles
-      const cyclesResponse = await cyclesAPI.list({ limit: 100 });
-      if (cyclesResponse?.data && Array.isArray(cyclesResponse.data)) {
-        setCycles(cyclesResponse.data.map((c: any) => ({ label: c.cycleName, value: c._id })));
+      // Load all data in parallel to improve performance
+      const [cyclesResponse, customersResponse, productsResponse, reportsResponse] = await Promise.allSettled([
+        cyclesAPI.list({ limit: 100 }),
+        customersAPI.getAll({ page: 1, limit: 100 }),
+        productsAPI.getAll({ page: 1, limit: 100 }),
+        reportsAPI.list({ limit: 10 })
+      ]);
+
+      // Handle cycles response
+      if (cyclesResponse.status === 'fulfilled' && cyclesResponse.value?.data && Array.isArray(cyclesResponse.value.data)) {
+        setCycles(cyclesResponse.value.data.map((c: any) => ({ label: c.cycleName, value: c._id })));
       } else {
-        console.warn('Cycles API returned invalid data:', cyclesResponse);
+        console.warn('Cycles API failed or returned invalid data:', cyclesResponse);
         setCycles([]);
       }
 
-      // Load customers
-      const customersResponse = await customersAPI.getAll({ page: 1, limit: 100 });
-      if (customersResponse?.customers && Array.isArray(customersResponse.customers)) {
-        setCustomers(customersResponse.customers.map(c => ({ label: c.customerName, value: c._id })));
+      // Handle customers response
+      if (customersResponse.status === 'fulfilled' && customersResponse.value?.customers && Array.isArray(customersResponse.value.customers)) {
+        setCustomers(customersResponse.value.customers.map(c => ({ label: c.customerName, value: c._id })));
       } else {
-        console.warn('Customers API returned invalid data:', customersResponse);
+        console.warn('Customers API failed or returned invalid data:', customersResponse);
         setCustomers([]);
       }
 
-      // Load products
-      const productsResponse = await productsAPI.getAll({ page: 1, limit: 100 });
-      if (productsResponse?.products && Array.isArray(productsResponse.products)) {
-        setProducts(productsResponse.products.map(p => ({ label: p.itemDescription, value: p._id })));
+      // Handle products response
+      if (productsResponse.status === 'fulfilled' && productsResponse.value?.products && Array.isArray(productsResponse.value.products)) {
+        setProducts(productsResponse.value.products.map(p => ({ label: p.itemDescription, value: p._id })));
       } else {
-        console.warn('Products API returned invalid data:', productsResponse);
+        console.warn('Products API failed or returned invalid data:', productsResponse);
         setProducts([]);
       }
 
-      // Load recent reports
-      const reportsResponse = await reportsAPI.list({ limit: 10 });
-      if (reportsResponse?.reports && Array.isArray(reportsResponse.reports)) {
-        setRecentReports(reportsResponse.reports);
+      // Handle reports response
+      if (reportsResponse.status === 'fulfilled' && reportsResponse.value?.reports && Array.isArray(reportsResponse.value.reports)) {
+        setRecentReports(reportsResponse.value.reports);
       } else {
-        console.warn('Reports API returned invalid data:', reportsResponse);
+        console.warn('Reports API failed or returned invalid data:', reportsResponse);
         setRecentReports([]);
+      }
+
+      // Show warning if any requests failed
+      const failedRequests = [cyclesResponse, customersResponse, productsResponse, reportsResponse].filter(
+        r => r.status === 'rejected'
+      );
+      if (failedRequests.length > 0) {
+        message.warning('Some data could not be loaded. You can still generate reports.');
       }
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -286,15 +298,14 @@ export default function Reports() {
     try {
       // Map report template to backend report type
       const reportTypeMap: { [key: string]: string } = {
-        'sales_summary': 'sales_summary',
-        'forecast_vs_actual': 'forecast_vs_actual',
-        'customer_performance': 'customer_performance',
-        'product_analysis': 'product_analysis',
-        'territory_performance': 'monthly_dashboard',
-        'cycle_submission_status': 'cycle_submission_status',
-        'gross_profit_analysis': 'gross_profit_analysis',
-        'forecast_accuracy': 'forecast_accuracy',
-        'monthly_dashboard': 'monthly_dashboard'
+        'sales-summary': 'sales_summary',
+        'forecast-vs-actual': 'forecast_vs_actual',
+        'customer-performance': 'customer_performance',
+        'product-analysis': 'product_analysis',
+        'cycle-submission': 'cycle_submission_status',
+        'gross-profit': 'gross_profit_analysis',
+        'forecast-accuracy': 'forecast_accuracy',
+        'monthly-dashboard': 'monthly_dashboard'
       };
 
       const reportType = reportTypeMap[selectedReport.id] || 'sales_summary';

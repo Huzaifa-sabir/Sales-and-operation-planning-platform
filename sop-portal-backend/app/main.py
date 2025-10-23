@@ -30,16 +30,15 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
 
-    # Connect to database (use standard database for Render)
+    # Connect to database (use Railway database for production)
     try:
-        await db.connect_db()
-        database = db.get_database()
-        logger.info("Using standard database connection")
-    except Exception as e:
-        logger.warning(f"Standard database connection failed, trying Railway: {e}")
         await railway_db.connect_db()
         database = railway_db.get_database()
         logger.info("Using Railway-optimized database connection")
+    except Exception as e:
+        logger.warning(f"Railway database connection failed, falling back to standard: {e}")
+        await db.connect_db()
+        database = db.get_database()
 
     # Create performance indexes
     logger.info("Creating database indexes...")
@@ -49,6 +48,12 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing default settings...")
     settings_service = SettingsService(database)
     await settings_service.initialize_default_settings()
+
+    # Create storage directories for reports
+    import os
+    logger.info("Creating storage directories...")
+    os.makedirs('storage/reports', exist_ok=True)
+    os.makedirs('storage/temp', exist_ok=True)
 
     # Start background scheduler
     logger.info("Starting background scheduler...")
@@ -86,17 +91,17 @@ app = FastAPI(
 )
 
 
-# Configure CORS - Simplified for debugging
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://soptest.netlify.app", "http://localhost:5173", "http://localhost:5174"],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Add rate limiting middleware (temporarily disabled for CORS testing)
-# app.add_middleware(RateLimiterMiddleware, requests_per_minute=60)
+# Add rate limiting middleware
+app.add_middleware(RateLimiterMiddleware, requests_per_minute=60)
 
 
 # Root endpoint
