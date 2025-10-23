@@ -5,7 +5,6 @@ import logging
 
 from app.config.settings import settings
 from app.config.database import db
-from app.config.railway_database import railway_db
 from app.config.indexes import create_performance_indexes
 from app.services.settings_service import SettingsService
 from app.utils.scheduler import BackgroundScheduler
@@ -30,15 +29,10 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
 
-    # Connect to database (use Railway database for production)
-    try:
-        await railway_db.connect_db()
-        database = railway_db.get_database()
-        logger.info("Using Railway-optimized database connection")
-    except Exception as e:
-        logger.warning(f"Railway database connection failed, falling back to standard: {e}")
-        await db.connect_db()
-        database = db.get_database()
+    # Connect to database
+    await db.connect_db()
+    database = db.get_database()
+    logger.info("Database connection established")
 
     # Create performance indexes
     logger.info("Creating database indexes...")
@@ -69,14 +63,11 @@ async def lifespan(app: FastAPI):
     if scheduler:
         scheduler.shutdown()
 
-    try:
-        await railway_db.close_db()
-    except:
-        pass
+    # Close database connection
     try:
         await db.close_db()
-    except:
-        pass
+    except Exception as e:
+        logger.error(f"Error closing database: {e}")
 
 
 # Create FastAPI application
@@ -91,17 +82,37 @@ app = FastAPI(
 )
 
 
-# Configure CORS
+# Configure CORS - Must be added before other middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Add rate limiting middleware
 app.add_middleware(RateLimiterMiddleware, requests_per_minute=60)
+
+
+# Add CORS headers to all responses (additional layer)
+@app.middleware("http")
+async def add_cors_headers(request, call_next):
+    """Add CORS headers to all responses"""
+    response = await call_next(request)
+    origin = request.headers.get("origin")
+
+    # Check if origin is allowed
+    if origin in settings.cors_origins_list:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Expose-Headers"] = "*"
+
+    return response
 
 
 # Root endpoint
