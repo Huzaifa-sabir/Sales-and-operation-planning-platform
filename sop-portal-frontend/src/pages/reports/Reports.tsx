@@ -211,22 +211,47 @@ export default function Reports() {
     try {
       // Load cycles
       const cyclesResponse = await cyclesAPI.list({ limit: 100 });
-      setCycles(cyclesResponse.data.map((c: any) => ({ label: c.cycleName, value: c._id })));
+      if (cyclesResponse?.data && Array.isArray(cyclesResponse.data)) {
+        setCycles(cyclesResponse.data.map((c: any) => ({ label: c.cycleName, value: c._id })));
+      } else {
+        console.warn('Cycles API returned invalid data:', cyclesResponse);
+        setCycles([]);
+      }
 
       // Load customers
       const customersResponse = await customersAPI.getAll({ page: 1, limit: 100 });
-      setCustomers(customersResponse.customers.map(c => ({ label: c.customerName, value: c._id })));
+      if (customersResponse?.customers && Array.isArray(customersResponse.customers)) {
+        setCustomers(customersResponse.customers.map(c => ({ label: c.customerName, value: c._id })));
+      } else {
+        console.warn('Customers API returned invalid data:', customersResponse);
+        setCustomers([]);
+      }
 
       // Load products
       const productsResponse = await productsAPI.getAll({ page: 1, limit: 100 });
-      setProducts(productsResponse.products.map(p => ({ label: p.itemDescription, value: p._id })));
+      if (productsResponse?.products && Array.isArray(productsResponse.products)) {
+        setProducts(productsResponse.products.map(p => ({ label: p.itemDescription, value: p._id })));
+      } else {
+        console.warn('Products API returned invalid data:', productsResponse);
+        setProducts([]);
+      }
 
       // Load recent reports
       const reportsResponse = await reportsAPI.list({ limit: 10 });
-      setRecentReports(reportsResponse.reports);
+      if (reportsResponse?.reports && Array.isArray(reportsResponse.reports)) {
+        setRecentReports(reportsResponse.reports);
+      } else {
+        console.warn('Reports API returned invalid data:', reportsResponse);
+        setRecentReports([]);
+      }
     } catch (error) {
       console.error('Failed to load data:', error);
       message.error('Failed to load report data');
+      // Set empty arrays as fallback
+      setCycles([]);
+      setCustomers([]);
+      setProducts([]);
+      setRecentReports([]);
     } finally {
       setLoading(false);
     }
