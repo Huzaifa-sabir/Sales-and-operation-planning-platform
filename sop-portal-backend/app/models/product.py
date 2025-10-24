@@ -27,11 +27,11 @@ class ProductBase(BaseModel):
     """Base product model"""
     itemCode: str = Field(..., description="Unique item code")
     itemDescription: str = Field(..., min_length=1, description="Product description")
-    group: ProductGroup = Field(..., description="Product group")
-    manufacturing: ProductManufacturing = Field(..., description="Manufacturing info")
+    group: Optional[ProductGroup] = Field(None, description="Product group")
+    manufacturing: Optional[ProductManufacturing] = Field(None, description="Manufacturing info")
     weight: Optional[float] = Field(None, ge=0, description="Product weight")
-    uom: str = Field(..., description="Unit of measure (CS, BAG, etc.)")
-    pricing: ProductPricing = Field(..., description="Pricing information")
+    uom: Optional[str] = Field(None, description="Unit of measure (CS, BAG, etc.)")
+    pricing: Optional[ProductPricing] = Field(None, description="Pricing information")
     isActive: bool = Field(default=True, description="Whether product is active")
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
 
