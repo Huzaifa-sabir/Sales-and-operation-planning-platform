@@ -73,7 +73,7 @@ export default function ProductList() {
   const stats = {
     total: pagination.total,
     active: products.filter((p) => p.isActive).length,
-    groups: new Set(products.map((p) => p.group.code)).size,
+    groups: new Set(products.map((p) => p.group?.code).filter(Boolean)).size,
   };
 
   const columns: ColumnsType<Product> = [
@@ -97,21 +97,21 @@ export default function ProductList() {
       key: 'group',
       width: 100,
       render: (_, record) => (
-        <Tag color="purple">{record.group.code}</Tag>
+        record.group?.code ? <Tag color="purple">{record.group.code}</Tag> : <span>-</span>
       ),
     },
     {
       title: 'Sub-Group',
       key: 'subgroup',
       width: 120,
-      render: (_, record) => record.group.subgroup || '-',
+      render: (_, record) => record.group?.subgroup || '-',
     },
     {
       title: 'Location',
       key: 'location',
       width: 150,
       render: (_, record) => (
-        <Tag color="blue">{record.manufacturing.location}</Tag>
+        record.manufacturing?.location ? <Tag color="blue">{record.manufacturing.location}</Tag> : <span>-</span>
       ),
     },
     {
@@ -128,6 +128,7 @@ export default function ProductList() {
       key: 'uom',
       width: 80,
       align: 'center',
+      render: (uom) => uom || '-',
     },
     {
       title: 'Avg Price',
