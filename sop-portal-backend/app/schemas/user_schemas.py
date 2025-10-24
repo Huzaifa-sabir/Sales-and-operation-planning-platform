@@ -15,6 +15,7 @@ class UserCreateRequest(BaseModel):
     email: EmailStr = Field(..., description="User email address")
     fullName: str = Field(..., min_length=1, max_length=100, description="User's full name")
     role: UserRole = Field(..., description="User role (admin or sales_rep)")
+    password: Optional[str] = Field(None, min_length=8, description="Password (optional - will be auto-generated if not provided)")
 
     @field_validator('username')
     @classmethod

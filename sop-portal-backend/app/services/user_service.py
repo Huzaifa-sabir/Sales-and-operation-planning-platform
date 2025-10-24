@@ -61,8 +61,15 @@ class UserService:
         logger = logging.getLogger(__name__)
         logger.info(f"Creating user: {user_data.username}")
         logger.info(f"Password source: {'provided by admin' if not was_generated else 'auto-generated'}")
+        logger.info(f"Password to hash: '{password_to_use}'")
         logger.info(f"Password length: {len(password_to_use)}")
+        logger.info(f"Hashed password: {hashed_password[:30]}...")
         logger.info(f"Hashed password length: {len(hashed_password)}")
+
+        # Verify the hash works immediately
+        from app.utils.security import verify_password
+        test_verify = verify_password(password_to_use, hashed_password)
+        logger.info(f"Immediate verification test: {test_verify}")
 
         # Create user document
         user_doc = {
