@@ -76,7 +76,17 @@ async def login(
         )
 
     # Verify password
-    if not verify_password(credentials.password, user_doc.get("hashedPassword", "")):
+    hashed_password = user_doc.get("hashedPassword", "")
+
+    # Add logging for debugging (remove in production)
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"Login attempt for user: {user_doc.get('username')} (email: {user_doc.get('email')})")
+    logger.info(f"Has password hash: {bool(hashed_password)}")
+
+    if not verify_password(credentials.password, hashed_password):
+        logger.warning(f"Password verification failed for user: {user_doc.get('username')}")
+
         # Increment login attempts
         new_attempts = login_attempts + 1
         await db.users.update_one(

@@ -46,13 +46,23 @@ class UserService:
         # Generate a random password if not provided
         generated_password = self._generate_password()
 
+        # Hash the password
+        hashed_password = hash_password(generated_password)
+
+        # Log for debugging (remove in production)
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Creating user: {user_data.username}")
+        logger.info(f"Generated password length: {len(generated_password)}")
+        logger.info(f"Hashed password length: {len(hashed_password)}")
+
         # Create user document
         user_doc = {
             "username": user_data.username,
             "email": user_data.email,
             "fullName": user_data.fullName,
             "role": user_data.role,
-            "hashedPassword": hash_password(generated_password),
+            "hashedPassword": hashed_password,
             "isActive": True,
             "loginAttempts": 0,
             "createdAt": datetime.utcnow(),
@@ -64,6 +74,8 @@ class UserService:
 
         result = await self.collection.insert_one(user_doc)
         user_doc["_id"] = str(result.inserted_id)
+
+        logger.info(f"User created successfully with ID: {user_doc['_id']}")
 
         return UserInDB(**user_doc), generated_password
 
