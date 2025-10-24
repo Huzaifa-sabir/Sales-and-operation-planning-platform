@@ -52,7 +52,8 @@ async def create_user(
         username=user_data.username,
         email=user_data.email,
         fullName=user_data.fullName,
-        role=user_data.role
+        role=user_data.role,
+        password=user_data.password  # Pass password from request
     )
 
     created_user, generated_password = await user_service.create_user(user_create)
