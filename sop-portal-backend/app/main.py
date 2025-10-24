@@ -86,12 +86,25 @@ app = FastAPI(
 )
 
 
-# Configure CORS
+# Configure CORS - Explicit configuration for production
+cors_origins = [
+    "http://localhost:5173",
+    "http://localhost:5174", 
+    "http://localhost:3000",
+    "https://soptest.netlify.app"
+]
+
+# Add any additional origins from environment variables
+if hasattr(settings, 'cors_origins_list') and settings.cors_origins_list:
+    for origin in settings.cors_origins_list:
+        if origin not in cors_origins:
+            cors_origins.append(origin)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
 
@@ -108,6 +121,16 @@ async def root():
         "version": settings.APP_VERSION,
         "status": "running",
         "docs": "/api/docs"
+    }
+
+# Debug endpoint to check CORS configuration
+@app.get("/debug/cors")
+async def debug_cors():
+    """Debug endpoint to check CORS configuration"""
+    return {
+        "cors_origins": cors_origins,
+        "settings_cors": getattr(settings, 'cors_origins_list', 'Not set'),
+        "environment": "production" if not settings.DEBUG else "development"
     }
 
 
