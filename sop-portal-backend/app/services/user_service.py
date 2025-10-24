@@ -43,17 +43,25 @@ class UserService:
                     detail="Email already exists"
                 )
 
-        # Generate a random password if not provided
-        generated_password = self._generate_password()
+        # Use provided password or generate a random one
+        if user_data.password:
+            # Use the password provided by admin
+            password_to_use = user_data.password
+            was_generated = False
+        else:
+            # Generate a random password
+            password_to_use = self._generate_password()
+            was_generated = True
 
         # Hash the password
-        hashed_password = hash_password(generated_password)
+        hashed_password = hash_password(password_to_use)
 
         # Log for debugging (remove in production)
         import logging
         logger = logging.getLogger(__name__)
         logger.info(f"Creating user: {user_data.username}")
-        logger.info(f"Generated password length: {len(generated_password)}")
+        logger.info(f"Password source: {'provided by admin' if not was_generated else 'auto-generated'}")
+        logger.info(f"Password length: {len(password_to_use)}")
         logger.info(f"Hashed password length: {len(hashed_password)}")
 
         # Create user document
@@ -77,7 +85,7 @@ class UserService:
 
         logger.info(f"User created successfully with ID: {user_doc['_id']}")
 
-        return UserInDB(**user_doc), generated_password
+        return UserInDB(**user_doc), password_to_use
 
     async def get_user_by_id(self, user_id: str) -> Optional[UserInDB]:
         """Get user by ID"""

@@ -279,16 +279,33 @@ export default function UserManagement() {
         setUsers(users.map((u) => (u._id === editingUser._id ? updatedUser : u)));
         message.success('User updated successfully');
       } else {
-        // Create new user - only send required fields
+        // Create new user with password
         const createData = {
           username: values.username,
           email: values.email,
           fullName: values.fullName,
-          role: values.role
+          role: values.role,
+          password: values.password  // Include the password from the form
         };
         const response = await usersAPI.create(createData);
         setUsers([response.user, ...users]);
-        message.success(`User created successfully. Password: ${response.generatedPassword}`);
+
+        // Show modal with the password that was set
+        Modal.success({
+          title: 'User Created Successfully!',
+          content: (
+            <div>
+              <p><strong>Username:</strong> {values.username}</p>
+              <p><strong>Email:</strong> {values.email}</p>
+              <p><strong>Password:</strong> {values.password}</p>
+              <p style={{marginTop: 16, color: '#ff4d4f'}}>
+                ⚠️ Please save this password! The user will need it to log in.
+              </p>
+            </div>
+          ),
+          okText: 'I have saved the password',
+          width: 500,
+        });
       }
 
       setIsModalOpen(false);
