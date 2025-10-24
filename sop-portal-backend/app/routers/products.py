@@ -98,55 +98,66 @@ async def list_products(
     - **groupCode/group_code**: Filter by group code (optional)
     - **location**: Filter by manufacturing location (optional)
     """
-    product_service = ProductService(db)
+    try:
+        product_service = ProductService(db)
 
-    # Use limit if provided, otherwise use pageSize
-    items_per_page = limit if limit != 10 else (pageSize or limit)
+        # Use limit if provided, otherwise use pageSize
+        items_per_page = limit if limit != 10 else (pageSize or limit)
 
-    # Use the provided parameter (priority to camelCase)
-    active_filter = isActive if isActive is not None else is_active
-    customer_filter = customerId if customerId else customer_id
-    group_filter = groupCode if groupCode else group_code
+        # Use the provided parameter (priority to camelCase)
+        active_filter = isActive if isActive is not None else is_active
+        customer_filter = customerId if customerId else customer_id
+        group_filter = groupCode if groupCode else group_code
 
-    skip = (page - 1) * items_per_page
+        skip = (page - 1) * items_per_page
 
-    result = await product_service.list_products(
-        skip=skip,
-        limit=items_per_page,
-        is_active=active_filter,
-        search=search,
-        customer_id=customer_filter,
-        group_code=group_filter,
-        location=location
-    )
-
-    # Convert products to ProductResponse
-    product_responses = [
-        ProductResponse(
-            id=product.id,
-            itemCode=product.itemCode,
-            itemDescription=product.itemDescription,
-            group=product.group,
-            manufacturing=product.manufacturing,
-            pricing=product.pricing,
-            weight=product.weight,
-            uom=product.uom,
-            isActive=product.isActive,
-            createdAt=product.createdAt,
-            updatedAt=product.updatedAt
+        result = await product_service.list_products(
+            skip=skip,
+            limit=items_per_page,
+            is_active=active_filter,
+            search=search,
+            customer_id=customer_filter,
+            group_code=group_filter,
+            location=location
         )
-        for product in result["products"]
-    ]
 
-    return ProductListResponse(
-        products=product_responses,
-        total=result["total"],
-        page=result["page"],
-        pageSize=result["pageSize"],
-        totalPages=result["totalPages"],
-        hasNext=result["hasNext"],
-        hasPrev=result["hasPrev"]
-    )
+        # Convert products to ProductResponse
+        product_responses = [
+            ProductResponse(
+                id=product.id,
+                itemCode=product.itemCode,
+                itemDescription=product.itemDescription,
+                group=product.group,
+                manufacturing=product.manufacturing,
+                pricing=product.pricing,
+                weight=product.weight,
+                uom=product.uom,
+                isActive=product.isActive,
+                createdAt=product.createdAt,
+                updatedAt=product.updatedAt
+            )
+            for product in result["products"]
+        ]
+
+        return ProductListResponse(
+            products=product_responses,
+            total=result["total"],
+            page=result["page"],
+            pageSize=result["pageSize"],
+            totalPages=result["totalPages"],
+            hasNext=result["hasNext"],
+            hasPrev=result["hasPrev"]
+        )
+    except Exception as e:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error listing products: {str(e)}", exc_info=True)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to list products: {str(e)}"
+        )
 
 
 @router.get(

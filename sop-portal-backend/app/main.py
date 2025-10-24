@@ -106,10 +106,24 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,  # Cache preflight for 1 hour
 )
 
 # Add rate limiting middleware (temporarily disabled for CORS testing)
 # app.add_middleware(RateLimiterMiddleware, requests_per_minute=60)
+
+
+# Add custom exception handler for better error responses
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    """Handle all unhandled exceptions"""
+    logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
+    return {
+        "detail": str(exc),
+        "type": type(exc).__name__,
+        "path": request.url.path
+    }
 
 
 # Root endpoint
