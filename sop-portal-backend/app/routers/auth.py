@@ -233,4 +233,9 @@ async def refresh_token(
         current_user.role
     )
 
-    return token_response
+    # Add CORS headers to response
+    from fastapi import Response
+    response = Response(content=token_response.json(), media_type="application/json")
+    response.headers["Access-Control-Allow-Origin"] = "https://soptest.netlify.app"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
