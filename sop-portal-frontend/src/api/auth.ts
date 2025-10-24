@@ -2,26 +2,25 @@ import axiosInstance from './axios';
 import type { LoginCredentials, LoginResponse, User } from '@/types';
 
 export const authAPI = {
-  // Login - Backend expects JSON with username and password
+  // Login - Backend expects JSON with email/username and password
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
       const response = await axiosInstance.post<{
         access_token: string;
         token_type: string;
-        expires_in: number;
         user: {
-          id: string;
+          _id: string;
           username: string;
           email: string;
-          firstName: string;
-          lastName: string;
           fullName: string;
           role: string;
-          employeeId: string;
           isActive: boolean;
+          lastLogin?: string;
+          createdAt?: string;
+          updatedAt?: string;
         };
       }>('/auth/login', {
-        username: credentials.email, // Send as username (backend will detect if it's an email)
+        email: credentials.email,  // Send as email
         password: credentials.password,
       });
 
@@ -30,14 +29,14 @@ export const authAPI = {
         accessToken: response.data.access_token,
         tokenType: response.data.token_type,
         user: {
-          _id: response.data.user.id,
+          _id: response.data.user._id,
           username: response.data.user.username,
-          email: response.data.user.email || response.data.user.username,
-          fullName: response.data.user.fullName || `${response.data.user.firstName} ${response.data.user.lastName}`,
+          email: response.data.user.email,
+          fullName: response.data.user.fullName,
           role: response.data.user.role as 'admin' | 'sales_rep',
           isActive: response.data.user.isActive,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: response.data.user.createdAt || new Date().toISOString(),
+          updatedAt: response.data.user.updatedAt || new Date().toISOString(),
         },
       };
     } catch (error) {
