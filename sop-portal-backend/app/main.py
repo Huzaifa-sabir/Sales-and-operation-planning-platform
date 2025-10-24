@@ -86,12 +86,12 @@ app = FastAPI(
 )
 
 
-# Configure CORS - Simplified for debugging
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://soptest.netlify.app", "http://localhost:5173", "http://localhost:5174"],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
