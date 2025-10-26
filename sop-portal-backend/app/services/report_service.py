@@ -20,7 +20,7 @@ class ReportService:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.reports_collection = db.reports
-        self.sales_collection = db.sales_history
+        self.sales_collection = db.salesHistory  # Using salesHistory (216 records) instead of sales_history (176)
         self.forecasts_collection = db.forecasts
         self.customers_collection = db.customers
         self.products_collection = db.products
@@ -129,10 +129,10 @@ class ReportService:
             {
                 "$group": {
                     "_id": None,
-                    "totalQuantity": {"$sum": "$quantitySold"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}},
+                    "totalQuantity": {"$sum": "$quantity"},
+                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
                     "transactionCount": {"$sum": 1},
-                    "avgQuantity": {"$avg": "$quantitySold"},
+                    "avgQuantity": {"$avg": "$quantity"},
                     "avgUnitPrice": {"$avg": "$unitPrice"}
                 }
             }
@@ -156,8 +156,8 @@ class ReportService:
                         "year": "$year",
                         "month": "$month"
                     },
-                    "quantity": {"$sum": "$quantitySold"},
-                    "revenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}},
+                    "quantity": {"$sum": "$quantity"},
+                    "revenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
                     "transactions": {"$sum": 1}
                 }
             },
@@ -175,8 +175,8 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$customerId",
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}},
-                    "totalQuantity": {"$sum": "$quantitySold"},
+                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalQuantity": {"$sum": "$quantity"},
                     "transactions": {"$sum": 1}
                 }
             },
@@ -197,8 +197,8 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$productId",
-                    "totalQuantity": {"$sum": "$quantitySold"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}},
+                    "totalQuantity": {"$sum": "$quantity"},
+                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
                     "transactions": {"$sum": 1}
                 }
             },
@@ -299,7 +299,7 @@ class ReportService:
                 })
 
                 forecast_qty = month_forecast.get("quantity", 0)
-                actual_qty = actual_sales.get("quantitySold", 0) if actual_sales else 0
+                actual_qty = actual_sales.get("quantity", 0) if actual_sales else 0
 
                 variance = actual_qty - forecast_qty
                 variance_pct = (variance / forecast_qty * 100) if forecast_qty > 0 else 0
@@ -368,8 +368,8 @@ class ReportService:
             {
                 "$group": {
                     "_id": None,
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}},
-                    "totalQuantity": {"$sum": "$quantitySold"},
+                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalQuantity": {"$sum": "$quantity"},
                     "transactions": {"$sum": 1}
                 }
             }
@@ -392,8 +392,8 @@ class ReportService:
             {
                 "$group": {
                     "_id": None,
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}},
-                    "totalQuantity": {"$sum": "$quantitySold"}
+                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalQuantity": {"$sum": "$quantity"}
                 }
             }
         ]).to_list(1)
@@ -411,7 +411,7 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$customerId",
-                    "revenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}}
+                    "revenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}}
                 }
             },
             {"$sort": {"revenue": -1}},
@@ -427,7 +427,7 @@ class ReportService:
         top_products = await self.products_collection.aggregate([
             {
                 "$lookup": {
-                    "from": "sales_history",
+                    "from": "salesHistory",  # Changed from sales_history to salesHistory
                     "let": {"itemCode": "$itemCode"},
                     "pipeline": [
                         {
@@ -444,7 +444,7 @@ class ReportService:
                         {
                             "$group": {
                                 "_id": None,
-                                "quantity": {"$sum": "$quantitySold"}
+                                "quantity": {"$sum": "$quantity"}
                             }
                         }
                     ],
@@ -526,10 +526,10 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$customerId",
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}},
-                    "totalQuantity": {"$sum": "$quantitySold"},
+                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalQuantity": {"$sum": "$quantity"},
                     "transactions": {"$sum": 1},
-                    "avgOrderValue": {"$avg": {"$multiply": ["$quantitySold", "$unitPrice"]}},
+                    "avgOrderValue": {"$avg": {"$multiply": ["$quantity", "$unitPrice"]}},
                     "firstPurchase": {"$min": "$saleDate"},
                     "lastPurchase": {"$max": "$saleDate"},
                     "uniqueProducts": {"$addToSet": "$productId"}
@@ -607,8 +607,8 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$productId",
-                    "totalQuantity": {"$sum": "$quantitySold"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantitySold", "$unitPrice"]}},
+                    "totalQuantity": {"$sum": "$quantity"},
+                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
                     "transactions": {"$sum": 1},
                     "avgPrice": {"$avg": "$unitPrice"},
                     "uniqueCustomers": {"$addToSet": "$customerId"}
@@ -813,11 +813,11 @@ class ReportService:
             {
                 "$addFields": {
                     "cost": {"$ifNull": ["$pricing.cost", 0]},
-                    "revenue": {"$multiply": ["$quantitySold", "$unitPrice"]},
+                    "revenue": {"$multiply": ["$quantity", "$unitPrice"]},
                     "grossProfit": {
                         "$subtract": [
-                            {"$multiply": ["$quantitySold", "$unitPrice"]},
-                            {"$multiply": ["$quantitySold", {"$ifNull": ["$pricing.cost", 0]}]}
+                            {"$multiply": ["$quantity", "$unitPrice"]},
+                            {"$multiply": ["$quantity", {"$ifNull": ["$pricing.cost", 0]}]}
                         ]
                     },
                     "profitMargin": {
@@ -851,10 +851,10 @@ class ReportService:
                         "productId": "$productId"
                     },
                     "totalRevenue": {"$sum": "$revenue"},
-                    "totalCost": {"$sum": {"$multiply": ["$quantitySold", "$cost"]}},
+                    "totalCost": {"$sum": {"$multiply": ["$quantity", "$cost"]}},
                     "totalGrossProfit": {"$sum": "$grossProfit"},
                     "avgMargin": {"$avg": "$profitMargin"},
-                    "quantity": {"$sum": "$quantitySold"}
+                    "quantity": {"$sum": "$quantity"}
                 }
             },
             {"$sort": {"totalGrossProfit": -1}},
@@ -953,7 +953,7 @@ class ReportService:
                     continue
 
                 forecast_qty = month_forecast.get("quantity", 0)
-                actual_qty = actual_sales.get("quantitySold", 0)
+                actual_qty = actual_sales.get("quantity", 0)
 
                 if forecast_qty == 0:
                     continue
