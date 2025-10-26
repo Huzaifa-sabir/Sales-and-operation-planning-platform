@@ -20,7 +20,7 @@ class ReportService:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.reports_collection = db.reports
-        self.sales_collection = db.salesHistory  # Using salesHistory (216 records) instead of sales_history (176)
+        self.sales_collection = db.sales_history  # Using sales_history collection
         self.forecasts_collection = db.forecasts
         self.customers_collection = db.customers
         self.products_collection = db.products
@@ -130,7 +130,7 @@ class ReportService:
                 "$group": {
                     "_id": None,
                     "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "transactionCount": {"$sum": 1},
                     "avgQuantity": {"$avg": "$quantity"},
                     "avgUnitPrice": {"$avg": "$unitPrice"}
@@ -157,7 +157,7 @@ class ReportService:
                         "month": "$month"
                     },
                     "quantity": {"$sum": "$quantity"},
-                    "revenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "revenue": {"$sum": "$totalSales"},
                     "transactions": {"$sum": 1}
                 }
             },
@@ -175,7 +175,7 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$customerId",
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "totalQuantity": {"$sum": "$quantity"},
                     "transactions": {"$sum": 1}
                 }
@@ -198,7 +198,7 @@ class ReportService:
                 "$group": {
                     "_id": "$productId",
                     "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "transactions": {"$sum": 1}
                 }
             },
@@ -362,13 +362,13 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "monthNum": target_month  # Fixed: use monthNum instead of month
+                    "month": target_month  # Fixed: use month instead of monthNum
                 }
             },
             {
                 "$group": {
                     "_id": None,
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "totalQuantity": {"$sum": "$quantity"},
                     "transactions": {"$sum": 1}
                 }
@@ -386,13 +386,13 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "monthNum": {"$lte": target_month}  # Fixed: use monthNum instead of month
+                    "month": {"$lte": target_month}  # Fixed: use month instead of monthNum
                 }
             },
             {
                 "$group": {
                     "_id": None,
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "totalQuantity": {"$sum": "$quantity"}
                 }
             }
@@ -405,7 +405,7 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "monthNum": target_month  # Fixed: use monthNum instead of month
+                    "month": target_month  # Fixed: use month instead of monthNum
                 }
             },
             {
@@ -427,7 +427,7 @@ class ReportService:
         top_products = await self.products_collection.aggregate([
             {
                 "$lookup": {
-                    "from": "salesHistory",  # Changed from sales_history to salesHistory
+                    "from": "sales_history",  # Using correct collection name
                     "let": {"itemCode": "$itemCode"},
                     "pipeline": [
                         {
@@ -526,7 +526,7 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$customerId",
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "totalQuantity": {"$sum": "$quantity"},
                     "transactions": {"$sum": 1},
                     "avgOrderValue": {"$avg": {"$multiply": ["$quantity", "$unitPrice"]}},
@@ -608,7 +608,7 @@ class ReportService:
                 "$group": {
                     "_id": "$productId",
                     "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "transactions": {"$sum": 1},
                     "avgPrice": {"$avg": "$unitPrice"},
                     "uniqueCustomers": {"$addToSet": "$customerId"}
@@ -1035,7 +1035,7 @@ class ReportService:
             match_stage["year"] = filters["year"]
 
         if filters.get("month"):
-            match_stage["monthNum"] = filters["month"]  # Fixed: database uses monthNum (integer) not month (string)
+            match_stage["month"] = filters["month"]  # Fixed: database uses month (integer)
 
         if filters.get("startDate") or filters.get("endDate"):
             # Date range logic

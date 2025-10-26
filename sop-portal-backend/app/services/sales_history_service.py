@@ -85,7 +85,28 @@ class SalesHistoryService:
         sales_records = []
         async for record in cursor:
             record["_id"] = str(record["_id"])
-            sales_records.append(SalesHistoryInDB(**record))
+            # Convert to response format
+            sales_records.append({
+                "id": record["_id"],
+                "customerId": record.get("customerId", ""),
+                "customerName": record.get("customerName", ""),
+                "productId": record.get("productId", ""),
+                "productCode": record.get("productCode", ""),
+                "productDescription": record.get("productDescription", ""),
+                "yearMonth": record.get("yearMonth", ""),
+                "year": record.get("year", 0),
+                "month": record.get("month", 0),
+                "quantity": record.get("quantity", 0),
+                "unitPrice": record.get("unitPrice", 0),
+                "totalSales": record.get("totalSales", 0),
+                "costPrice": record.get("costPrice"),
+                "cogs": record.get("cogs"),
+                "grossProfit": record.get("grossProfit"),
+                "grossProfitPercent": record.get("grossProfitPercent"),
+                "salesRepId": record.get("salesRepId", ""),
+                "salesRepName": record.get("salesRepName", ""),
+                "createdAt": record.get("createdAt", datetime.utcnow())
+            })
 
         # Calculate pagination info
         total_pages = (total + limit - 1) // limit if limit > 0 else 1
@@ -106,7 +127,9 @@ class SalesHistoryService:
         customer_id: Optional[str] = None,
         product_id: Optional[str] = None,
         start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
+        end_date: Optional[datetime] = None,
+        year: Optional[int] = None,
+        month: Optional[int] = None
     ) -> Dict[str, Any]:
         """
         Get aggregated sales statistics
@@ -120,6 +143,15 @@ class SalesHistoryService:
 
         if product_id:
             match_stage["productId"] = product_id
+
+        # Year/month filtering
+        if year and month:
+            # Specific month
+            match_stage["year"] = year
+            match_stage["month"] = month
+        elif year:
+            # Specific year
+            match_stage["year"] = year
 
         if start_date or end_date:
             date_filter = {}
@@ -139,7 +171,7 @@ class SalesHistoryService:
                 "$group": {
                     "_id": None,
                     "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "avgQuantity": {"$avg": "$quantity"},
                     "avgUnitPrice": {"$avg": "$unitPrice"},
                     "recordCount": {"$sum": 1},
@@ -210,7 +242,7 @@ class SalesHistoryService:
                         "month": "$month"
                     },
                     "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "recordCount": {"$sum": 1}
                 }
             },
@@ -268,7 +300,7 @@ class SalesHistoryService:
                 "$group": {
                     "_id": "$productId",
                     "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "avgUnitPrice": {"$avg": "$unitPrice"}
                 }
             },
@@ -317,7 +349,7 @@ class SalesHistoryService:
                 "$group": {
                     "_id": "$customerId",
                     "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": {"$multiply": ["$quantity", "$unitPrice"]}},
+                    "totalRevenue": {"$sum": "$totalSales"},
                     "avgUnitPrice": {"$avg": "$unitPrice"}
                 }
             },

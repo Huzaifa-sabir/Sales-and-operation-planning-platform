@@ -91,6 +91,8 @@ async def get_sales_history(
 async def get_sales_statistics(
     customerId: Optional[str] = Query(None, description="Filter by customer ID"),
     productId: Optional[str] = Query(None, description="Filter by product ID"),
+    year: Optional[int] = Query(None, description="Filter by year"),
+    month: Optional[int] = Query(None, ge=1, le=12, description="Filter by month (1-12)"),
     db: AsyncIOMotorDatabase = Depends(get_db),
     current_user: UserInDB = Depends(get_current_active_user)
 ):
@@ -104,7 +106,9 @@ async def get_sales_statistics(
 
     stats = await sales_service.get_sales_statistics(
         customer_id=customerId,
-        product_id=productId
+        product_id=productId,
+        year=year,
+        month=month
     )
 
     return SalesStatisticsResponse(**stats)
