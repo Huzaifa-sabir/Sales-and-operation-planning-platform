@@ -235,15 +235,15 @@ class ExcelReportGenerator:
 
         self.write_table_data(trends_data, start_row=4)
 
-        # Add line chart
-        if len(trends_data) > 0:
-            chart_row = len(trends_data) + 4
-            self.add_line_chart(
-                title="Sales Trend",
-                categories_range=f"A4:A{chart_row}",
-                data_ranges=[f"B4:B{chart_row}", f"C4:C{chart_row}"],
-                position=f"E3"
-            )
+        # Skip charts for now to avoid errors
+        # if len(trends_data) > 0:
+        #     chart_row = len(trends_data) + 4
+        #     self.add_line_chart(
+        #         title="Sales Trend",
+        #         categories_range=f"A4:A{chart_row}",
+        #         data_ranges=[f"B4:B{chart_row}", f"C4:C{chart_row}"],
+        #         position=f"E3"
+        #     )
 
         self.auto_fit_columns()
 
@@ -269,14 +269,14 @@ class ExcelReportGenerator:
 
         self.write_table_data(customers_data, start_row=4)
 
-        # Add bar chart
-        if len(customers_data) > 0:
-            self.add_bar_chart(
-                title="Top Customers Revenue",
-                categories_range=f"B4:B{3+len(customers_data)}",
-                data_range=f"C3:C{3+len(customers_data)}",
-                position="G3"
-            )
+        # Skip charts for now to avoid errors
+        # if len(customers_data) > 0:
+        #     self.add_bar_chart(
+        #         title="Top Customers Revenue",
+        #         categories_range=f"B4:B{3+len(customers_data)}",
+        #         data_range=f"C3:C{3+len(customers_data)}",
+        #         position="G3"
+        #     )
 
         self.auto_fit_columns()
 
@@ -302,14 +302,14 @@ class ExcelReportGenerator:
 
         self.write_table_data(products_data, start_row=4)
 
-        # Add bar chart
-        if len(products_data) > 0:
-            self.add_bar_chart(
-                title="Top Products Volume",
-                categories_range=f"B4:B{3+len(products_data)}",
-                data_range=f"C3:C{3+len(products_data)}",
-                position="G3"
-            )
+        # Skip charts for now to avoid errors
+        # if len(products_data) > 0:
+        #     self.add_bar_chart(
+        #         title="Top Products Volume",
+        #         categories_range=f"B4:B{3+len(products_data)}",
+        #         data_range=f"C3:C{3+len(products_data)}",
+        #         position="G3"
+        #     )
 
         self.auto_fit_columns()
 
