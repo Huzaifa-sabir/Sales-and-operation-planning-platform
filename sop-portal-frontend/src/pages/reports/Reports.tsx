@@ -188,7 +188,8 @@ export default function Reports() {
   const [selectedReport, setSelectedReport] = useState<ReportTemplate | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const [reportParams, setReportParams] = useState<any>({
-    dateRange: [dayjs().subtract(6, 'months'), dayjs()],
+    year: undefined,
+    month: undefined,
     customer: undefined,
     product: undefined,
     salesRep: undefined,
@@ -265,7 +266,8 @@ export default function Reports() {
     setSelectedReport(report);
     // Reset parameters
     setReportParams({
-      dateRange: report.parameters.dateRange ? [dayjs().subtract(6, 'months'), dayjs()] : undefined,
+      year: undefined,
+      month: undefined,
       customer: undefined,
       product: undefined,
       salesRep: undefined,
@@ -317,9 +319,12 @@ export default function Reports() {
       if (reportParams.product) {
         params.productId = reportParams.product;
       }
-      if (reportParams.dateRange && reportParams.dateRange.length === 2) {
-        params.startDate = reportParams.dateRange[0].format('YYYY-MM-DD');
-        params.endDate = reportParams.dateRange[1].format('YYYY-MM-DD');
+      // Add year and month filters
+      if (reportParams.year) {
+        params.year = reportParams.year;
+      }
+      if (reportParams.month) {
+        params.month = reportParams.month;
       }
 
       // Generate and download report instantly
@@ -492,17 +497,52 @@ export default function Reports() {
               <Divider orientation="left">Report Parameters</Divider>
 
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                {/* Date Range */}
+                {/* Year and Month Filters */}
                 {selectedReport.parameters.dateRange && (
-                  <div>
-                    <Text strong>Date Range:</Text>
-                    <RangePicker
-                      style={{ width: '100%', marginTop: 8 }}
-                      value={reportParams.dateRange}
-                      onChange={(dates) => setReportParams({ ...reportParams, dateRange: dates })}
-                      size="large"
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <Text strong>Year:</Text>
+                      <Select
+                        placeholder="Select year (optional)"
+                        style={{ width: '100%', marginTop: 8 }}
+                        allowClear
+                        size="large"
+                        value={reportParams.year}
+                        onChange={(value) => setReportParams({ ...reportParams, year: value })}
+                        options={[
+                          { label: '2023', value: 2023 },
+                          { label: '2024', value: 2024 },
+                          { label: '2025', value: 2025 },
+                          { label: '2026', value: 2026 },
+                        ]}
+                      />
+                    </div>
+                    <div>
+                      <Text strong>Month:</Text>
+                      <Select
+                        placeholder="Select month (optional)"
+                        style={{ width: '100%', marginTop: 8 }}
+                        allowClear
+                        size="large"
+                        value={reportParams.month}
+                        onChange={(value) => setReportParams({ ...reportParams, month: value })}
+                        options={[
+                          { label: 'January', value: 1 },
+                          { label: 'February', value: 2 },
+                          { label: 'March', value: 3 },
+                          { label: 'April', value: 4 },
+                          { label: 'May', value: 5 },
+                          { label: 'June', value: 6 },
+                          { label: 'July', value: 7 },
+                          { label: 'August', value: 8 },
+                          { label: 'September', value: 9 },
+                          { label: 'October', value: 10 },
+                          { label: 'November', value: 11 },
+                          { label: 'December', value: 12 },
+                        ]}
+                      />
+                    </div>
+                  </>
                 )}
 
                 {/* S&OP Cycle */}
