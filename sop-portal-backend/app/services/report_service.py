@@ -1038,8 +1038,30 @@ class ReportService:
             match_stage["month"] = filters["month"]  # Fixed: database uses month (integer)
 
         if filters.get("startDate") or filters.get("endDate"):
-            # Date range logic
-            pass
+            # Date range logic - convert to year/month filtering
+            from datetime import datetime
+            
+            if filters.get("startDate"):
+                start_date = datetime.fromisoformat(filters["startDate"].replace('Z', '+00:00'))
+                match_stage["year"] = {"$gte": start_date.year}
+                if filters.get("endDate"):
+                    end_date = datetime.fromisoformat(filters["endDate"].replace('Z', '+00:00'))
+                    if start_date.year == end_date.year:
+                        match_stage["year"] = start_date.year
+                        match_stage["month"] = {"$gte": start_date.month, "$lte": end_date.month}
+                    else:
+                        # Multi-year range - use year range
+                        match_stage["year"] = {"$gte": start_date.year, "$lte": end_date.year}
+                else:
+                    # Only start date - filter from that month onwards
+                    match_stage["year"] = {"$gte": start_date.year}
+                    if start_date.year == datetime.now().year:
+                        match_stage["month"] = {"$gte": start_date.month}
+            elif filters.get("endDate"):
+                end_date = datetime.fromisoformat(filters["endDate"].replace('Z', '+00:00'))
+                match_stage["year"] = {"$lte": end_date.year}
+                if end_date.year == datetime.now().year:
+                    match_stage["month"] = {"$lte": end_date.month}
 
         return match_stage
 
