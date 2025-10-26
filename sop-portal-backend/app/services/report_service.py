@@ -1041,9 +1041,14 @@ class ReportService:
             # Date range logic - convert to year/month filtering
             from datetime import datetime
             
+            print(f"DEBUG: Processing date filters: startDate={filters.get('startDate')}, endDate={filters.get('endDate')}")
+            print(f"DEBUG: Current match_stage before date processing: {match_stage}")
+            
             if filters.get("startDate") and filters.get("endDate"):
                 start_date = datetime.fromisoformat(filters["startDate"].replace('Z', '+00:00'))
                 end_date = datetime.fromisoformat(filters["endDate"].replace('Z', '+00:00'))
+                
+                print(f"DEBUG: Parsed dates - start: {start_date}, end: {end_date}")
                 
                 if start_date.year == end_date.year:
                     # Same year - filter by year and month range
@@ -1055,6 +1060,7 @@ class ReportService:
                     
                     match_stage["year"] = start_date.year
                     match_stage["month"] = {"$gte": start_date.month, "$lte": end_date.month}
+                    print(f"DEBUG: Same year filtering - year: {start_date.year}, month: {start_date.month}-{end_date.month}")
                 else:
                     # Different years - use year range only
                     if "year" in match_stage:
@@ -1063,6 +1069,7 @@ class ReportService:
                         del match_stage["month"]
                     
                     match_stage["year"] = {"$gte": start_date.year, "$lte": end_date.year}
+                    print(f"DEBUG: Different year filtering - year: {start_date.year}-{end_date.year}")
             elif filters.get("startDate"):
                 # Only start date - filter from that year onwards
                 start_date = datetime.fromisoformat(filters["startDate"].replace('Z', '+00:00'))
@@ -1072,6 +1079,7 @@ class ReportService:
                     del match_stage["month"]
                     
                 match_stage["year"] = {"$gte": start_date.year}
+                print(f"DEBUG: Start date only filtering - year >= {start_date.year}")
             elif filters.get("endDate"):
                 # Only end date - filter up to that year
                 end_date = datetime.fromisoformat(filters["endDate"].replace('Z', '+00:00'))
@@ -1081,6 +1089,9 @@ class ReportService:
                     del match_stage["month"]
                     
                 match_stage["year"] = {"$lte": end_date.year}
+                print(f"DEBUG: End date only filtering - year <= {end_date.year}")
+            
+            print(f"DEBUG: Final match_stage after date processing: {match_stage}")
 
         return match_stage
 

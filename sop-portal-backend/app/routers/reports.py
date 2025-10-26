@@ -494,12 +494,18 @@ async def generate_instant_report(
             if request.format == ReportFormat.EXCEL:
                 from app.utils.excel_report_generator import ExcelReportGenerator
                 generator = ExcelReportGenerator()
-                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                # Create storage directory if it doesn't exist
+                import os
+                os.makedirs("storage/reports", exist_ok=True)
+                file_path = f"storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
                 generator.generate_sales_summary_excel(data, file_path)
             elif request.format == ReportFormat.PDF:
                 from app.utils.pdf_report_generator import PDFReportGenerator
                 generator = PDFReportGenerator()
-                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.pdf"
+                # Create storage directory if it doesn't exist
+                import os
+                os.makedirs("storage/reports", exist_ok=True)
+                file_path = f"storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.pdf"
                 generator.generate_sales_summary_pdf(data, file_path)
 
         elif request.reportType == ReportType.FORECAST_VS_ACTUAL:
