@@ -50,9 +50,11 @@ async def generate_report_task(
     Updates report status and file path after generation
     """
     try:
+        from bson import ObjectId
+
         # Update status to GENERATING
         await report_service.db["reports"].update_one(
-            {"_id": report_id},
+            {"_id": ObjectId(report_id)},
             {"$set": {"status": ReportStatus.GENERATING, "updatedAt": datetime.utcnow()}}
         )
 
@@ -152,7 +154,7 @@ async def generate_report_task(
         download_url = f"/api/v1/reports/{report_id}/download" if file_path else None
 
         await report_service.db["reports"].update_one(
-            {"_id": report_id},
+            {"_id": ObjectId(report_id)},
             {
                 "$set": {
                     "status": ReportStatus.COMPLETED,
@@ -167,7 +169,7 @@ async def generate_report_task(
     except Exception as e:
         # Update status to FAILED with error message
         await report_service.db["reports"].update_one(
-            {"_id": report_id},
+            {"_id": ObjectId(report_id)},
             {
                 "$set": {
                     "status": ReportStatus.FAILED,
@@ -429,6 +431,177 @@ async def download_report(
         filename=report.fileName or os.path.basename(report.filePath),
         media_type=media_type
     )
+
+
+@router.post(
+    "/generate-instant",
+    summary="Generate and download report instantly",
+    description="Generate report and return file immediately (synchronous)",
+    response_class=FileResponse
+)
+async def generate_instant_report(
+    request: ReportGenerateRequest,
+    current_user: UserInDB = Depends(get_current_user),
+    report_service: ReportService = Depends(get_report_service)
+):
+    """
+    Generate a report synchronously and return file immediately
+
+    This endpoint generates the report and returns the file in a single request.
+    No polling required - file downloads immediately.
+
+    Recommended for smaller reports that generate quickly (< 30 seconds).
+    For large reports, use /generate endpoint with polling.
+    """
+    import tempfile
+    import uuid
+    from datetime import datetime as dt
+
+    # Only support Excel and PDF
+    if request.format not in [ReportFormat.EXCEL, ReportFormat.PDF]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only EXCEL and PDF formats are supported"
+        )
+
+    # Build filters
+    filters = {}
+    if request.cycleId:
+        filters["cycleId"] = request.cycleId
+    if request.customerId:
+        filters["customerId"] = request.customerId
+    if request.productId:
+        filters["productId"] = request.productId
+    if request.startDate:
+        filters["startDate"] = request.startDate
+    if request.endDate:
+        filters["endDate"] = request.endDate
+    if request.year:
+        filters["year"] = request.year
+    if request.month:
+        filters["month"] = request.month
+
+    try:
+        # Generate data based on report type
+        data = None
+        file_path = None
+        report_name = ""
+
+        if request.reportType == ReportType.SALES_SUMMARY:
+            data = await report_service.generate_sales_summary_data(filters)
+            report_name = "sales_summary"
+
+            if request.format == ReportFormat.EXCEL:
+                from app.utils.excel_report_generator import ExcelReportGenerator
+                generator = ExcelReportGenerator()
+                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                generator.generate_sales_summary_excel(data, file_path)
+
+        elif request.reportType == ReportType.FORECAST_VS_ACTUAL:
+            data = await report_service.generate_forecast_vs_actual_data(filters)
+            report_name = "forecast_vs_actual"
+
+            if request.format == ReportFormat.EXCEL:
+                from app.utils.excel_report_generator import ExcelReportGenerator
+                generator = ExcelReportGenerator()
+                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                generator.generate_forecast_vs_actual_excel(data, file_path)
+
+        elif request.reportType == ReportType.MONTHLY_DASHBOARD:
+            data = await report_service.generate_monthly_dashboard_data(filters)
+            report_name = "monthly_dashboard"
+
+            if request.format == ReportFormat.EXCEL:
+                from app.utils.excel_report_generator import ExcelReportGenerator
+                generator = ExcelReportGenerator()
+                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                generator.generate_monthly_dashboard_excel(data, file_path)
+
+        elif request.reportType == ReportType.CUSTOMER_PERFORMANCE:
+            data = await report_service.generate_customer_performance_data(filters)
+            report_name = "customer_performance"
+
+            if request.format == ReportFormat.EXCEL:
+                from app.utils.excel_report_generator import ExcelReportGenerator
+                generator = ExcelReportGenerator()
+                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                generator.generate_customer_performance_excel(data, file_path)
+
+        elif request.reportType == ReportType.PRODUCT_ANALYSIS:
+            data = await report_service.generate_product_analysis_data(filters)
+            report_name = "product_analysis"
+
+            if request.format == ReportFormat.EXCEL:
+                from app.utils.excel_report_generator import ExcelReportGenerator
+                generator = ExcelReportGenerator()
+                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                generator.generate_product_analysis_excel(data, file_path)
+
+        elif request.reportType == ReportType.CYCLE_SUBMISSION_STATUS:
+            data = await report_service.generate_cycle_submission_status_data(filters)
+            report_name = "cycle_submission_status"
+
+            if request.format == ReportFormat.EXCEL:
+                from app.utils.excel_report_generator import ExcelReportGenerator
+                generator = ExcelReportGenerator()
+                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                generator.generate_cycle_submission_status_excel(data, file_path)
+
+        elif request.reportType == ReportType.GROSS_PROFIT_ANALYSIS:
+            data = await report_service.generate_gross_profit_analysis_data(filters)
+            report_name = "gross_profit_analysis"
+
+            if request.format == ReportFormat.EXCEL:
+                from app.utils.excel_report_generator import ExcelReportGenerator
+                generator = ExcelReportGenerator()
+                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                generator.generate_gross_profit_analysis_excel(data, file_path)
+
+        elif request.reportType == ReportType.FORECAST_ACCURACY:
+            data = await report_service.generate_forecast_accuracy_data(filters)
+            report_name = "forecast_accuracy"
+
+            if request.format == ReportFormat.EXCEL:
+                from app.utils.excel_report_generator import ExcelReportGenerator
+                generator = ExcelReportGenerator()
+                file_path = f"sop-portal-backend/storage/reports/{report_name}_{uuid.uuid4().hex[:8]}.xlsx"
+                generator.generate_forecast_accuracy_excel(data, file_path)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Report type {request.reportType} not implemented"
+            )
+
+        if not file_path or not os.path.exists(file_path):
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate report file"
+            )
+
+        # Determine media type
+        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        if file_path.endswith(".pdf"):
+            media_type = "application/pdf"
+
+        # Generate filename with timestamp
+        timestamp = dt.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{report_name}_{timestamp}.{'xlsx' if request.format == ReportFormat.EXCEL else 'pdf'}"
+
+        # Return file response
+        return FileResponse(
+            path=file_path,
+            filename=filename,
+            media_type=media_type,
+            background=None  # File will be kept after download
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Report generation failed: {str(e)}"
+        )
 
 
 @router.delete(

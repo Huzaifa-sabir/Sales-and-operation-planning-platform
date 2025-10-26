@@ -286,19 +286,19 @@ export default function Reports() {
     try {
       // Map report template to backend report type
       const reportTypeMap: { [key: string]: string } = {
-        'sales_summary': 'sales_summary',
-        'forecast_vs_actual': 'forecast_vs_actual',
-        'customer_performance': 'customer_performance',
-        'product_analysis': 'product_analysis',
-        'territory_performance': 'monthly_dashboard',
-        'cycle_submission_status': 'cycle_submission_status',
-        'gross_profit_analysis': 'gross_profit_analysis',
-        'forecast_accuracy': 'forecast_accuracy',
-        'monthly_dashboard': 'monthly_dashboard'
+        'sales-summary': 'sales_summary',
+        'forecast-vs-actual': 'forecast_vs_actual',
+        'customer-performance': 'customer_performance',
+        'product-analysis': 'product_analysis',
+        'territory-performance': 'monthly_dashboard',
+        'cycle-submission': 'cycle_submission_status',
+        'gross-profit': 'gross_profit_analysis',
+        'forecast-accuracy': 'forecast_accuracy',
+        'monthly-dashboard': 'monthly_dashboard'
       };
 
       const reportType = reportTypeMap[selectedReport.id] || 'sales_summary';
-      
+
       // Prepare parameters
       const params: any = {
         reportType,
@@ -322,17 +322,30 @@ export default function Reports() {
         params.endDate = reportParams.dateRange[1].format('YYYY-MM-DD');
       }
 
-      // Generate report
-      const report = await reportsAPI.generate(params);
-      
-      message.success(`Report generation started! Report ID: ${report.reportId}`);
-      
-      // Poll for completion
-      pollReportStatus(report.reportId);
-      
+      // Generate and download report instantly
+      message.loading({ content: 'Generating report...', key: 'reportGen', duration: 0 });
+
+      const blob = await reportsAPI.generateInstant(params);
+
+      message.success({ content: 'Report generated successfully!', key: 'reportGen', duration: 2 });
+
+      // Trigger download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      a.download = `${selectedReport.name}_${timestamp}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      // Refresh recent reports list
+      loadData();
+
     } catch (error) {
       console.error('Failed to generate report:', error);
-      message.error('Failed to generate report');
+      message.error({ content: 'Failed to generate report', key: 'reportGen', duration: 3 });
     } finally {
       setGenerating(false);
     }

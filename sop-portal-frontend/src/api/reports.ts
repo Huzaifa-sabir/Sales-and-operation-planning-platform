@@ -48,6 +48,14 @@ export interface ReportGenerationResponse {
 }
 
 export const reportsAPI = {
+  // Instant download - generates and downloads report immediately (no polling)
+  generateInstant: async (params: GenerateReportParams): Promise<Blob> => {
+    const response = await axiosInstance.post('/reports/generate-instant', params, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+
   // Unified generate report method (async)
   generate: async (params: GenerateReportParams): Promise<ReportGenerationResponse> => {
     const response = await axiosInstance.post<ReportGenerationResponse>('/reports/generate', params);
