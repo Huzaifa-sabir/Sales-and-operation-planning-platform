@@ -548,14 +548,14 @@ class ExcelReportGenerator:
 
         self.write_table_data(customer_data, start_row=4)
 
-        # Add bar chart for top 10
-        if len(customer_data) >= 10:
-            self.add_bar_chart(
-                title="Top 10 Customers by Revenue",
-                categories_range=f"B4:B13",
-                data_range=f"E3:E13",
-                position="M3"
-            )
+        # Skip charts for now to avoid errors
+        # if len(customer_data) >= 10:
+        #     self.add_bar_chart(
+        #         title="Top 10 Customers by Revenue",
+        #         categories_range=f"B4:B13",
+        #         data_range=f"E3:E13",
+        #         position="M3"
+        #     )
 
         self.auto_fit_columns()
         self.save(file_path)
@@ -625,14 +625,14 @@ class ExcelReportGenerator:
 
         self.write_table_data(category_data, start_row=4)
 
-        # Add pie chart for categories
-        if len(category_data) > 0:
-            self.add_bar_chart(
-                title="Revenue by Category",
-                categories_range=f"A4:A{3+len(category_data)}",
-                data_range=f"B3:B{3+len(category_data)}",
-                position="F3"
-            )
+        # Skip charts for now to avoid errors
+        # if len(category_data) > 0:
+        #     self.add_bar_chart(
+        #         title="Revenue by Category",
+        #         categories_range=f"A4:A{3+len(category_data)}",
+        #         data_range=f"B3:B{3+len(category_data)}",
+        #         position="F3"
+        #     )
 
         self.auto_fit_columns()
         self.save(file_path)
@@ -848,14 +848,14 @@ class ExcelReportGenerator:
 
         self.write_table_data(rep_data, start_row=4)
 
-        # Add bar chart
-        if len(rep_data) > 0:
-            self.add_bar_chart(
-                title="Accuracy Rate by Sales Rep",
-                categories_range=f"A4:A{3+min(len(rep_data), 10)}",
-                data_range=f"E3:E{3+min(len(rep_data), 10)}",
-                position="G3"
-            )
+        # Skip charts for now to avoid errors
+        # if len(rep_data) > 0:
+        #     self.add_bar_chart(
+        #         title="Accuracy Rate by Sales Rep",
+        #         categories_range=f"A4:A{3+min(len(rep_data), 10)}",
+        #         data_range=f"E3:E{3+min(len(rep_data), 10)}",
+        #         position="G3"
+        #     )
 
         self.auto_fit_columns()
 
