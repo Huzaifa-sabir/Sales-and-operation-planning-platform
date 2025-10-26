@@ -192,7 +192,7 @@ class PDFReportGenerator:
         story.append(Paragraph("Monthly Sales Trends", self.custom_styles['SectionHeader']))
 
         monthly_headers = ['Month', 'Revenue', 'Quantity', 'Transactions']
-        monthly_rows = [[m['monthLabel'], f"${m['totalRevenue']:,.2f}", f"{m['totalQuantity']:,.0f}", m['transactions']]
+        monthly_rows = [[m['monthLabel'], f"${m['revenue']:,.2f}", f"{m['quantity']:,.0f}", m['transactions']]
                         for m in data['monthlyTrends'][:12]]  # Last 12 months
 
         monthly_table_data = [monthly_headers] + monthly_rows
