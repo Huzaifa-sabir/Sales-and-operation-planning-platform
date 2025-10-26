@@ -211,8 +211,8 @@ export default function Reports() {
     try {
       // Load cycles
       const cyclesResponse = await cyclesAPI.list({ limit: 100 });
-      if (cyclesResponse?.data && Array.isArray(cyclesResponse.data)) {
-        setCycles(cyclesResponse.data.map((c: any) => ({ label: c.cycleName, value: c._id })));
+      if (cyclesResponse?.cycles && Array.isArray(cyclesResponse.cycles)) {
+        setCycles(cyclesResponse.cycles.map((c: any) => ({ label: c.cycleName, value: c._id })));
       } else {
         console.warn('Cycles API returned invalid data:', cyclesResponse);
         setCycles([]);

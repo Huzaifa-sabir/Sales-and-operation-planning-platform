@@ -1,5 +1,5 @@
 import axiosInstance from './axios';
-import type { SOPCycle, PaginatedResponse } from '@/types';
+import type { SOPCycle } from '@/types';
 
 export interface CycleCreate {
   cycleName: string;
@@ -28,8 +28,8 @@ export const cyclesAPI = {
     limit?: number;
     status?: 'DRAFT' | 'OPEN' | 'CLOSED';
     year?: number;
-  }): Promise<PaginatedResponse<SOPCycle>> => {
-    const response = await axiosInstance.get<PaginatedResponse<SOPCycle>>('/sop/cycles', { params });
+  }): Promise<{ cycles: SOPCycle[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean; hasPrev: boolean }> => {
+    const response = await axiosInstance.get<{ cycles: SOPCycle[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean; hasPrev: boolean }>('/sop/cycles', { params });
     return response.data;
   },
 

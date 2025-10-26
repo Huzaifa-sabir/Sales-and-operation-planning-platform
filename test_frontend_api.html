@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Frontend API Test</h1>
+    <p>This page tests the frontend API configuration and authentication flow.</p>
+
+    <div class="test-section info">
+        <h3>API Configuration</h3>
+        <p><strong>Backend URL:</strong> <span id="backend-url">Loading...</span></p>
+        <p><strong>Frontend URL:</strong> <span id="frontend-url">Loading...</span></p>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 1: Backend Health Check</h3>
+        <button onclick="testBackendHealth()">Test Backend Health</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Admin Login</h3>
+        <button onclick="testAdminLogin()">Test Admin Login</button>
+        <div id="admin-login-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Create User</h3>
+        <button onclick="testCreateUser()">Create Test User</button>
+        <div id="create-user-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 4: User Login</h3>
+        <button onclick="testUserLogin()">Test User Login</button>
+        <div id="user-login-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 5: Cleanup</h3>
+        <button onclick="cleanupTestUser()">Cleanup Test User</button>
+        <div id="cleanup-result"></div>
+    </div>
+
+    <script>
+        // Configuration
+        const BACKEND_URL = 'https://sales-and-operation-planning-platform-1.onrender.com/api/v1';
+        const FRONTEND_URL = window.location.origin;
+        
+        let adminToken = null;
+        let testUserId = null;
+        let testUserEmail = null;
+        let testUserPassword = 'TestUser123!';
+
+        // Initialize
+        document.getElementById('backend-url').textContent = BACKEND_URL;
+        document.getElementById('frontend-url').textContent = FRONTEND_URL;
+
+        // Helper function to display results
+        function displayResult(elementId, success, message, data = null) {
+            const element = document.getElementById(elementId);
+            element.className = success ? 'test-section success' : 'test-section error';
+            element.innerHTML = `
+                <h4>${success ? '✅ SUCCESS' : '❌ ERROR'}</h4>
+                <p>${message}</p>
+                ${data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''}
+            `;
+        }
+
+        // Test 1: Backend Health Check
+        async function testBackendHealth() {
+            try {
+                const response = await fetch(BACKEND_URL.replace('/api/v1', '') + '/health');
+                const data = await response.json();
+                displayResult('health-result', response.ok, 
+                    `Backend health check: ${response.status}`, data);
+            } catch (error) {
+                displayResult('health-result', false, 
+                    `Backend health check failed: ${error.message}`);
+            }
+        }
+
+        // Test 2: Admin Login
+        async function testAdminLogin() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': FRONTEND_URL
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@heavygarlic.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    adminToken = data.access_token;
+                    displayResult('admin-login-result', true, 
+                        'Admin login successful', { token: data.access_token.substring(0, 30) + '...' });
+                } else {
+                    displayResult('admin-login-result', false, 
+                        `Admin login failed: ${data.detail || 'Unknown error'}`, data);
+                }
+            } catch (error) {
+                displayResult('admin-login-result', false, 
+                    `Admin login failed: ${error.message}`);
+            }
+        }
+
+        // Test 3: Create User
+        async function testCreateUser() {
+            if (!adminToken) {
+                displayResult('create-user-result', false, 
+                    'Please login as admin first');
+                return;
+            }
+
+            try {
+                const timestamp = Date.now();
+                testUserEmail = `testuser_${timestamp}@test.com`;
+                
+                const response = await fetch(`${BACKEND_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Origin': FRONTEND_URL
+                    },
+                    body: JSON.stringify({
+                        username: `testuser_${timestamp}`,
+                        email: testUserEmail,
+                        fullName: 'Test User',
+                        role: 'sales_rep',
+                        password: testUserPassword
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    testUserId = data.user._id;
+                    displayResult('create-user-result', true, 
+                        'User created successfully', data);
+                } else {
+                    displayResult('create-user-result', false, 
+                        `User creation failed: ${data.detail || 'Unknown error'}`, data);
+                }
+            } catch (error) {
+                displayResult('create-user-result', false, 
+                    `User creation failed: ${error.message}`);
+            }
+        }
+
+        // Test 4: User Login
+        async function testUserLogin() {
+            if (!testUserEmail) {
+                displayResult('user-login-result', false, 
+                    'Please create a test user first');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': FRONTEND_URL
+                    },
+                    body: JSON.stringify({
+                        email: testUserEmail,
+                        password: testUserPassword
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResult('user-login-result', true, 
+                        'User login successful', { 
+                            user: data.user.username,
+                            token: data.access_token.substring(0, 30) + '...'
+                        });
+                } else {
+                    displayResult('user-login-result', false, 
+                        `User login failed: ${data.detail || 'Unknown error'}`, data);
+                }
+            } catch (error) {
+                displayResult('user-login-result', false, 
+                    `User login failed: ${error.message}`);
+            }
+        }
+
+        // Test 5: Cleanup
+        async function cleanupTestUser() {
+            if (!adminToken || !testUserId) {
+                displayResult('cleanup-result', false, 
+                    'No test user to cleanup');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/users/${testUserId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Origin': FRONTEND_URL
+                    }
+                });
+
+                if (response.ok) {
+                    displayResult('cleanup-result', true, 
+                        'Test user deleted successfully');
+                    testUserId = null;
+                    testUserEmail = null;
+                } else {
+                    const data = await response.json();
+                    displayResult('cleanup-result', false, 
+                        `Cleanup failed: ${data.detail || 'Unknown error'}`, data);
+                }
+            } catch (error) {
+                displayResult('cleanup-result', false, 
+                    `Cleanup failed: ${error.message}`);
+            }
+        }
+
+        // Auto-run initial tests
+        window.onload = function() {
+            testBackendHealth();
+        };
+    </script>
+</body>
+</html>

@@ -57,7 +57,7 @@ export default function SOPCycles() {
         limit: 100, // Get all cycles
       });
       // Backend returns { cycles, total, ... }
-      setCycles((response as any).cycles || response.data || []);
+      setCycles(response.cycles || []);
     } catch (error) {
       console.error('Failed to fetch cycles:', error);
       message.error('Failed to load S&OP cycles');
