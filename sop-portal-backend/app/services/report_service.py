@@ -1047,18 +1047,39 @@ class ReportService:
                 
                 if start_date.year == end_date.year:
                     # Same year - filter by year and month range
+                    # Clear any existing year/month filters first
+                    if "year" in match_stage:
+                        del match_stage["year"]
+                    if "month" in match_stage:
+                        del match_stage["month"]
+                    
                     match_stage["year"] = start_date.year
                     match_stage["month"] = {"$gte": start_date.month, "$lte": end_date.month}
                 else:
-                    # Different years - use year range
+                    # Different years - use year range only
+                    if "year" in match_stage:
+                        del match_stage["year"]
+                    if "month" in match_stage:
+                        del match_stage["month"]
+                    
                     match_stage["year"] = {"$gte": start_date.year, "$lte": end_date.year}
             elif filters.get("startDate"):
-                # Only start date - filter from that year/month onwards
+                # Only start date - filter from that year onwards
                 start_date = datetime.fromisoformat(filters["startDate"].replace('Z', '+00:00'))
+                if "year" in match_stage:
+                    del match_stage["year"]
+                if "month" in match_stage:
+                    del match_stage["month"]
+                    
                 match_stage["year"] = {"$gte": start_date.year}
             elif filters.get("endDate"):
-                # Only end date - filter up to that year/month
+                # Only end date - filter up to that year
                 end_date = datetime.fromisoformat(filters["endDate"].replace('Z', '+00:00'))
+                if "year" in match_stage:
+                    del match_stage["year"]
+                if "month" in match_stage:
+                    del match_stage["month"]
+                    
                 match_stage["year"] = {"$lte": end_date.year}
 
         return match_stage

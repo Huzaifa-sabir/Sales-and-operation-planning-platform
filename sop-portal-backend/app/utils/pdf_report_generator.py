@@ -175,13 +175,13 @@ class PDFReportGenerator:
         summary_header = Paragraph("Overall Summary", self.custom_styles['SectionHeader'])
         story.append(summary_header)
 
-        summary_data = data['summary']
+        summary_data = data.get('summary', {})
         summary_table_data = [
             ['Metric', 'Value'],
-            ['Total Revenue', f"${summary_data['totalRevenue']:,.2f}"],
-            ['Total Quantity', f"{summary_data['totalQuantity']:,.2f}"],
-            ['Transaction Count', f"{summary_data['transactionCount']:,}"],
-            ['Average Quantity', f"{summary_data['avgQuantity']:,.2f}"]
+            ['Total Revenue', f"${summary_data.get('totalRevenue', 0):,.2f}"],
+            ['Total Quantity', f"{summary_data.get('totalQuantity', 0):,.2f}"],
+            ['Transaction Count', f"{summary_data.get('transactionCount', 0):,}"],
+            ['Average Quantity', f"{summary_data.get('avgQuantity', 0):,.2f}"]
         ]
 
         summary_table = self._create_table(summary_table_data, col_widths=[3 * inch, 3 * inch])
@@ -191,37 +191,48 @@ class PDFReportGenerator:
         # Monthly Trends
         story.append(Paragraph("Monthly Sales Trends", self.custom_styles['SectionHeader']))
 
-        monthly_headers = ['Month', 'Revenue', 'Quantity', 'Transactions']
-        monthly_rows = [[m['monthLabel'], f"${m['revenue']:,.2f}", f"{m['quantity']:,.0f}", m['transactions']]
-                        for m in data['monthlyTrends'][:12]]  # Last 12 months
+        if data.get('monthlyTrends') and len(data['monthlyTrends']) > 0:
+            monthly_headers = ['Month', 'Revenue', 'Quantity', 'Transactions']
+            monthly_rows = [[m['monthLabel'], f"${m['revenue']:,.2f}", f"{m['quantity']:,.0f}", m['transactions']]
+                            for m in data['monthlyTrends'][:12]]  # Last 12 months
 
-        monthly_table_data = [monthly_headers] + monthly_rows
-        monthly_table = self._create_table(monthly_table_data, col_widths=[1.5 * inch, 1.5 * inch, 1.5 * inch, 1.5 * inch])
-        story.append(monthly_table)
+            monthly_table_data = [monthly_headers] + monthly_rows
+            monthly_table = self._create_table(monthly_table_data, col_widths=[1.5 * inch, 1.5 * inch, 1.5 * inch, 1.5 * inch])
+            story.append(monthly_table)
+        else:
+            story.append(Paragraph("No monthly trends data available", self.custom_styles['Normal']))
+        
         story.append(PageBreak())
 
         # Top Customers
         story.append(Paragraph("Top 10 Customers", self.custom_styles['SectionHeader']))
 
-        customer_headers = ['Customer', 'Revenue', 'Quantity']
-        customer_rows = [[c['customerName'][:30], f"${c['totalRevenue']:,.2f}", f"{c['totalQuantity']:,.0f}"]
-                        for c in data['topCustomers'][:10]]
+        if data.get('topCustomers') and len(data['topCustomers']) > 0:
+            customer_headers = ['Customer', 'Revenue', 'Quantity']
+            customer_rows = [[c['customerName'][:30], f"${c['totalRevenue']:,.2f}", f"{c['totalQuantity']:,.0f}"]
+                            for c in data['topCustomers'][:10]]
 
-        customer_table_data = [customer_headers] + customer_rows
-        customer_table = self._create_table(customer_table_data, col_widths=[3 * inch, 1.5 * inch, 1.5 * inch])
-        story.append(customer_table)
+            customer_table_data = [customer_headers] + customer_rows
+            customer_table = self._create_table(customer_table_data, col_widths=[3 * inch, 1.5 * inch, 1.5 * inch])
+            story.append(customer_table)
+        else:
+            story.append(Paragraph("No customer data available", self.custom_styles['Normal']))
+        
         story.append(Spacer(1, 0.3 * inch))
 
         # Top Products
         story.append(Paragraph("Top 10 Products", self.custom_styles['SectionHeader']))
 
-        product_headers = ['Product', 'Quantity', 'Revenue']
-        product_rows = [[p['productDescription'][:30], f"{p['totalQuantity']:,.0f}", f"${p['totalRevenue']:,.2f}"]
-                       for p in data['topProducts'][:10]]
+        if data.get('topProducts') and len(data['topProducts']) > 0:
+            product_headers = ['Product', 'Quantity', 'Revenue']
+            product_rows = [[p['productDescription'][:30], f"{p['totalQuantity']:,.0f}", f"${p['totalRevenue']:,.2f}"]
+                           for p in data['topProducts'][:10]]
 
-        product_table_data = [product_headers] + product_rows
-        product_table = self._create_table(product_table_data, col_widths=[3 * inch, 1.5 * inch, 1.5 * inch])
-        story.append(product_table)
+            product_table_data = [product_headers] + product_rows
+            product_table = self._create_table(product_table_data, col_widths=[3 * inch, 1.5 * inch, 1.5 * inch])
+            story.append(product_table)
+        else:
+            story.append(Paragraph("No product data available", self.custom_styles['Normal']))
 
         # Build PDF
         doc.build(story, onFirstPage=self._create_header_footer, onLaterPages=self._create_header_footer)
