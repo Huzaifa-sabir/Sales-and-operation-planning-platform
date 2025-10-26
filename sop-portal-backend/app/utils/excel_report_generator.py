@@ -95,20 +95,25 @@ class ExcelReportGenerator:
         height: int = 10
     ):
         """Add bar chart to current sheet"""
-        chart = BarChart()
-        chart.title = title
-        chart.style = 10
-        chart.width = width
-        chart.height = height
+        try:
+            chart = BarChart()
+            chart.title = title
+            chart.style = 10
+            chart.width = width
+            chart.height = height
 
-        # Set data
-        data = Reference(self.current_sheet, range_string=data_range)
-        cats = Reference(self.current_sheet, range_string=categories_range)
+            # Set data
+            data = Reference(self.current_sheet, range_string=data_range)
+            cats = Reference(self.current_sheet, range_string=categories_range)
 
-        chart.add_data(data, titles_from_data=True)
-        chart.set_categories(cats)
+            chart.add_data(data, titles_from_data=True)
+            chart.set_categories(cats)
 
-        self.current_sheet.add_chart(chart, position)
+            self.current_sheet.add_chart(chart, position)
+        except Exception as e:
+            # Skip chart generation if there's an error
+            print(f"Warning: Could not generate chart '{title}': {e}")
+            pass
 
     def add_line_chart(
         self,
@@ -120,21 +125,26 @@ class ExcelReportGenerator:
         height: int = 10
     ):
         """Add line chart to current sheet"""
-        chart = LineChart()
-        chart.title = title
-        chart.style = 10
-        chart.width = width
-        chart.height = height
+        try:
+            chart = LineChart()
+            chart.title = title
+            chart.style = 10
+            chart.width = width
+            chart.height = height
 
-        # Add multiple data series
-        for data_range in data_ranges:
-            data = Reference(self.current_sheet, range_string=data_range)
-            chart.add_data(data, titles_from_data=True)
+            # Add multiple data series
+            for data_range in data_ranges:
+                data = Reference(self.current_sheet, range_string=data_range)
+                chart.add_data(data, titles_from_data=True)
 
-        cats = Reference(self.current_sheet, range_string=categories_range)
-        chart.set_categories(cats)
+            cats = Reference(self.current_sheet, range_string=categories_range)
+            chart.set_categories(cats)
 
-        self.current_sheet.add_chart(chart, position)
+            self.current_sheet.add_chart(chart, position)
+        except Exception as e:
+            # Skip chart generation if there's an error
+            print(f"Warning: Could not generate chart '{title}': {e}")
+            pass
 
     def auto_fit_columns(self):
         """Auto-fit column widths based on content"""
@@ -227,11 +237,11 @@ class ExcelReportGenerator:
 
         # Add line chart
         if len(trends_data) > 0:
-            chart_row = len(trends_data) + 5
+            chart_row = len(trends_data) + 4
             self.add_line_chart(
                 title="Sales Trend",
-                categories_range=f"A4:A{chart_row-1}",
-                data_ranges=[f"B4:B{chart_row-1}", f"C4:C{chart_row-1}"],
+                categories_range=f"A4:A{chart_row}",
+                data_ranges=[f"B4:B{chart_row}", f"C4:C{chart_row}"],
                 position=f"E3"
             )
 
