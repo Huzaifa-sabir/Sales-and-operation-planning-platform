@@ -362,7 +362,7 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "month": target_month
+                    "monthNum": target_month  # Fixed: use monthNum instead of month
                 }
             },
             {
@@ -386,7 +386,7 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "month": {"$lte": target_month}
+                    "monthNum": {"$lte": target_month}  # Fixed: use monthNum instead of month
                 }
             },
             {
@@ -405,7 +405,7 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "month": target_month
+                    "monthNum": target_month  # Fixed: use monthNum instead of month
                 }
             },
             {
@@ -1035,7 +1035,7 @@ class ReportService:
             match_stage["year"] = filters["year"]
 
         if filters.get("month"):
-            match_stage["month"] = filters["month"]
+            match_stage["monthNum"] = filters["month"]  # Fixed: database uses monthNum (integer) not month (string)
 
         if filters.get("startDate") or filters.get("endDate"):
             # Date range logic
