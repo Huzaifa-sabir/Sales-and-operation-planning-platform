@@ -1058,8 +1058,14 @@ class ReportService:
                     if "month" in match_stage:
                         del match_stage["month"]
                     
-                    match_stage["year"] = start_date.year
-                    match_stage["month"] = {"$gte": start_date.month, "$lte": end_date.month}
+                    # For same year and month (November 2024)
+                    if start_date.month == end_date.month:
+                        match_stage["year"] = start_date.year
+                        match_stage["month"] = start_date.month
+                    else:
+                        # Different months in same year
+                        match_stage["year"] = start_date.year
+                        match_stage["month"] = {"$gte": start_date.month, "$lte": end_date.month}
                     print(f"DEBUG: Same year filtering - year: {start_date.year}, month: {start_date.month}-{end_date.month}")
                 else:
                     # Different years - use year range only
