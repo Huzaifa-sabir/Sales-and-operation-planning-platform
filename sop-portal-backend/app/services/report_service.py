@@ -154,7 +154,7 @@ class ReportService:
                 "$group": {
                     "_id": {
                         "year": {"$ifNull": ["$year", 0]},
-                        "month": {"$ifNull": ["$month", 0]}
+                        "month": {"$ifNull": ["$monthNum", 0]}  # Fixed: use monthNum field
                     },
                     "quantity": {"$sum": {"$ifNull": ["$quantity", 0]}},
                     "revenue": {"$sum": {"$ifNull": ["$totalSales", 0]}},
