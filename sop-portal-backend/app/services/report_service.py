@@ -1045,8 +1045,18 @@ class ReportService:
             print(f"DEBUG: Current match_stage before date processing: {match_stage}")
             
             if filters.get("startDate") and filters.get("endDate"):
-                start_date = datetime.fromisoformat(filters["startDate"].replace('Z', '+00:00'))
-                end_date = datetime.fromisoformat(filters["endDate"].replace('Z', '+00:00'))
+                # Handle both string and datetime objects
+                start_date = filters["startDate"]
+                if isinstance(start_date, str):
+                    start_date = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+                elif not isinstance(start_date, datetime):
+                    start_date = datetime.fromisoformat(str(start_date))
+                
+                end_date = filters["endDate"]
+                if isinstance(end_date, str):
+                    end_date = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+                elif not isinstance(end_date, datetime):
+                    end_date = datetime.fromisoformat(str(end_date))
                 
                 print(f"DEBUG: Parsed dates - start: {start_date}, end: {end_date}")
                 
@@ -1078,7 +1088,12 @@ class ReportService:
                     print(f"DEBUG: Different year filtering - year: {start_date.year}-{end_date.year}")
             elif filters.get("startDate"):
                 # Only start date - filter from that year onwards
-                start_date = datetime.fromisoformat(filters["startDate"].replace('Z', '+00:00'))
+                # Handle both string and datetime objects
+                start_date = filters["startDate"]
+                if isinstance(start_date, str):
+                    start_date = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+                elif not isinstance(start_date, datetime):
+                    start_date = datetime.fromisoformat(str(start_date))
                 if "year" in match_stage:
                     del match_stage["year"]
                 if "monthNum" in match_stage:
@@ -1088,7 +1103,12 @@ class ReportService:
                 print(f"DEBUG: Start date only filtering - year >= {start_date.year}")
             elif filters.get("endDate"):
                 # Only end date - filter up to that year
-                end_date = datetime.fromisoformat(filters["endDate"].replace('Z', '+00:00'))
+                # Handle both string and datetime objects
+                end_date = filters["endDate"]
+                if isinstance(end_date, str):
+                    end_date = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+                elif not isinstance(end_date, datetime):
+                    end_date = datetime.fromisoformat(str(end_date))
                 if "year" in match_stage:
                     del match_stage["year"]
                 if "monthNum" in match_stage:
