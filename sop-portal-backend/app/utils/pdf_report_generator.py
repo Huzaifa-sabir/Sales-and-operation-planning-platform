@@ -69,6 +69,14 @@ class PDFReportGenerator:
             textColor=colors.HexColor("#6B7280"),
             spaceAfter=6
         )
+        
+        # Normal style (fallback for plain text)
+        styles['Normal'] = ParagraphStyle(
+            'Normal',
+            parent=self.styles['Normal'],
+            fontSize=10,
+            spaceAfter=6
+        )
 
         return styles
 
