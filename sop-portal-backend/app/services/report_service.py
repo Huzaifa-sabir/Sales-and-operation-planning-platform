@@ -20,7 +20,7 @@ class ReportService:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.reports_collection = db.reports
-        self.sales_collection = db.salesHistory  # Using salesHistory collection (216 records)
+        self.sales_collection = db.sales_history  # Using sales_history collection for consistency with sales history API
         self.forecasts_collection = db.forecasts
         self.customers_collection = db.customers
         self.products_collection = db.products
@@ -427,7 +427,7 @@ class ReportService:
         top_products = await self.products_collection.aggregate([
             {
                 "$lookup": {
-                    "from": "salesHistory",  # Fixed: use salesHistory collection name
+                    "from": "sales_history",  # Fixed: use sales_history collection name for consistency
                     "let": {"itemCode": "$itemCode"},
                     "pipeline": [
                         {
