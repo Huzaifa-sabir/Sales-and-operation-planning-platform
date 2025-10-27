@@ -129,11 +129,11 @@ class ReportService:
             {
                 "$group": {
                     "_id": None,
-                    "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": "$totalSales"},
+                    "totalQuantity": {"$sum": {"$ifNull": ["$quantity", 0]}},
+                    "totalRevenue": {"$sum": {"$ifNull": ["$totalSales", 0]}},
                     "transactionCount": {"$sum": 1},
-                    "avgQuantity": {"$avg": "$quantity"},
-                    "avgUnitPrice": {"$avg": "$unitPrice"}
+                    "avgQuantity": {"$avg": {"$ifNull": ["$quantity", 0]}},
+                    "avgUnitPrice": {"$avg": {"$ifNull": ["$unitPrice", 0]}}
                 }
             }
         ]
@@ -153,11 +153,11 @@ class ReportService:
             {
                 "$group": {
                     "_id": {
-                        "year": "$year",
-                        "month": "$month"
+                        "year": {"$ifNull": ["$year", 0]},
+                        "month": {"$ifNull": ["$month", 0]}
                     },
-                    "quantity": {"$sum": "$quantity"},
-                    "revenue": {"$sum": "$totalSales"},
+                    "quantity": {"$sum": {"$ifNull": ["$quantity", 0]}},
+                    "revenue": {"$sum": {"$ifNull": ["$totalSales", 0]}},
                     "transactions": {"$sum": 1}
                 }
             },
@@ -175,8 +175,8 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$customerId",
-                    "totalRevenue": {"$sum": "$totalSales"},
-                    "totalQuantity": {"$sum": "$quantity"},
+                    "totalRevenue": {"$sum": {"$ifNull": ["$totalSales", 0]}},
+                    "totalQuantity": {"$sum": {"$ifNull": ["$quantity", 0]}},
                     "transactions": {"$sum": 1}
                 }
             },
@@ -197,8 +197,8 @@ class ReportService:
             {
                 "$group": {
                     "_id": "$productId",
-                    "totalQuantity": {"$sum": "$quantity"},
-                    "totalRevenue": {"$sum": "$totalSales"},
+                    "totalQuantity": {"$sum": {"$ifNull": ["$quantity", 0]}},
+                    "totalRevenue": {"$sum": {"$ifNull": ["$totalSales", 0]}},
                     "transactions": {"$sum": 1}
                 }
             },
