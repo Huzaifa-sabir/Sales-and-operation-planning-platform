@@ -20,7 +20,7 @@ class ReportService:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
         self.reports_collection = db.reports
-        self.sales_collection = db.sales_history  # Using sales_history collection
+        self.sales_collection = db.salesHistory  # Using salesHistory collection (216 records)
         self.forecasts_collection = db.forecasts
         self.customers_collection = db.customers
         self.products_collection = db.products
@@ -362,7 +362,7 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "month": target_month  # Fixed: use month instead of monthNum
+                    "monthNum": target_month  # Fixed: monthNum is integer field
                 }
             },
             {
@@ -386,7 +386,7 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "month": {"$lte": target_month}  # Fixed: use month instead of monthNum
+                    "monthNum": {"$lte": target_month}  # Fixed: monthNum is integer field
                 }
             },
             {
@@ -405,7 +405,7 @@ class ReportService:
             {
                 "$match": {
                     "year": target_year,
-                    "month": target_month  # Fixed: use month instead of monthNum
+                    "monthNum": target_month  # Fixed: monthNum is integer field
                 }
             },
             {
@@ -427,7 +427,7 @@ class ReportService:
         top_products = await self.products_collection.aggregate([
             {
                 "$lookup": {
-                    "from": "sales_history",  # Using correct collection name
+                    "from": "salesHistory",  # Fixed: use salesHistory collection name
                     "let": {"itemCode": "$itemCode"},
                     "pipeline": [
                         {
@@ -436,7 +436,7 @@ class ReportService:
                                     "$and": [
                                         {"$eq": ["$productId", "$$itemCode"]},
                                         {"$eq": ["$year", target_year]},
-                                        {"$eq": ["$month", target_month]}
+                                        {"$eq": ["$monthNum", target_month]}
                                     ]
                                 }
                             }
@@ -1035,7 +1035,7 @@ class ReportService:
             match_stage["year"] = filters["year"]
 
         if filters.get("month"):
-            match_stage["month"] = filters["month"]  # Fixed: database uses month (integer)
+            match_stage["monthNum"] = filters["month"]  # Fixed: monthNum is integer field
 
         if filters.get("startDate") or filters.get("endDate"):
             # Date range logic - convert to year/month filtering
@@ -1055,25 +1055,25 @@ class ReportService:
                     # Clear any existing year/month filters first
                     if "year" in match_stage:
                         del match_stage["year"]
-                    if "month" in match_stage:
-                        del match_stage["month"]
-                    
+                    if "monthNum" in match_stage:
+                        del match_stage["monthNum"]
+
                     # For same year and month (November 2024)
                     if start_date.month == end_date.month:
                         match_stage["year"] = start_date.year
-                        match_stage["month"] = start_date.month
+                        match_stage["monthNum"] = start_date.month
                     else:
                         # Different months in same year
                         match_stage["year"] = start_date.year
-                        match_stage["month"] = {"$gte": start_date.month, "$lte": end_date.month}
+                        match_stage["monthNum"] = {"$gte": start_date.month, "$lte": end_date.month}
                     print(f"DEBUG: Same year filtering - year: {start_date.year}, month: {start_date.month}-{end_date.month}")
                 else:
                     # Different years - use year range only
                     if "year" in match_stage:
                         del match_stage["year"]
-                    if "month" in match_stage:
-                        del match_stage["month"]
-                    
+                    if "monthNum" in match_stage:
+                        del match_stage["monthNum"]
+
                     match_stage["year"] = {"$gte": start_date.year, "$lte": end_date.year}
                     print(f"DEBUG: Different year filtering - year: {start_date.year}-{end_date.year}")
             elif filters.get("startDate"):
@@ -1081,9 +1081,9 @@ class ReportService:
                 start_date = datetime.fromisoformat(filters["startDate"].replace('Z', '+00:00'))
                 if "year" in match_stage:
                     del match_stage["year"]
-                if "month" in match_stage:
-                    del match_stage["month"]
-                    
+                if "monthNum" in match_stage:
+                    del match_stage["monthNum"]
+
                 match_stage["year"] = {"$gte": start_date.year}
                 print(f"DEBUG: Start date only filtering - year >= {start_date.year}")
             elif filters.get("endDate"):
@@ -1091,9 +1091,9 @@ class ReportService:
                 end_date = datetime.fromisoformat(filters["endDate"].replace('Z', '+00:00'))
                 if "year" in match_stage:
                     del match_stage["year"]
-                if "month" in match_stage:
-                    del match_stage["month"]
-                    
+                if "monthNum" in match_stage:
+                    del match_stage["monthNum"]
+
                 match_stage["year"] = {"$lte": end_date.year}
                 print(f"DEBUG: End date only filtering - year <= {end_date.year}")
             
