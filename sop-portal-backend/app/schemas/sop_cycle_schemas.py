@@ -14,12 +14,18 @@ class CycleCreateRequest(BaseModel):
     cycleName: Optional[str] = Field(None, description="Cycle name (auto-generated if not provided)")
     startDate: Optional[datetime] = Field(None, description="Start date (defaults to current date)")
     endDate: Optional[datetime] = Field(None, description="End date (defaults to end of month)")
+    year: Optional[int] = Field(None, description="Explicit year provided by client")
+    month: Optional[int] = Field(None, description="Explicit month provided by client")
+    planningStartMonth: Optional[datetime] = Field(None, description="Planning start month anchor")
 
 
 class CycleUpdateRequest(BaseModel):
     """Request schema for updating a cycle"""
     cycleName: Optional[str] = Field(None, min_length=1, max_length=200)
     endDate: Optional[datetime] = None
+    year: Optional[int] = None
+    month: Optional[int] = None
+    planningStartMonth: Optional[datetime] = None
 
 
 class CycleListResponse(BaseModel):

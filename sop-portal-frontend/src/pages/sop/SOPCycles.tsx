@@ -54,7 +54,8 @@ export default function SOPCycles() {
     try {
       setFetchLoading(true);
       const response = await cyclesAPI.list({
-        limit: 100, // Get all cycles
+        page: 1,
+        pageSize: 100, // Get all cycles
       });
       // Backend returns { cycles, total, ... }
       setCycles(response.cycles || []);
@@ -105,32 +106,42 @@ export default function SOPCycles() {
       render: (_, record) => dayjs(record.dates.startDate).format('MMM DD, YYYY'),
     },
     {
-      title: 'Close Date',
-      key: 'closeDate',
+      title: 'End Date',
+      key: 'endDate',
       width: 120,
-      render: (_, record) => dayjs(record.dates.closeDate).format('MMM DD, YYYY'),
+      render: (_, record) => dayjs(record.dates.endDate).format('MMM DD, YYYY'),
     },
     {
       title: 'Planning Period',
       key: 'planningPeriod',
       width: 180,
-      render: (_, record) => (
-        <span>
-          {dayjs(record.dates.planningStartMonth).format('MMM YYYY')} -{' '}
-          {dayjs(record.dates.planningEndMonth).format('MMM YYYY')}
-        </span>
-      ),
+      render: (_, record) => {
+        const ps = record.planningPeriod;
+        if (ps?.startYear && ps?.startMonth && ps?.endYear && ps?.endMonth) {
+          const start = dayjs(`${ps.startYear}-${String(ps.startMonth).padStart(2, '0')}-01`);
+          const end = dayjs(`${ps.endYear}-${String(ps.endMonth).padStart(2, '0')}-01`);
+          return (
+            <span>
+              {start.format('MMM YYYY')} - {end.format('MMM YYYY')}
+            </span>
+          );
+        }
+        return '-';
+      },
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status) => (
-        <Tag color={getStatusColor(status)} style={{ textTransform: 'capitalize' }}>
-          {status}
-        </Tag>
-      ),
+      render: (status) => {
+        const normalized = String(status || '').toLowerCase();
+        return (
+          <Tag color={getStatusColor(normalized)} style={{ textTransform: 'capitalize' }}>
+            {normalized}
+          </Tag>
+        );
+      },
     },
     {
       title: 'Submissions',
@@ -140,12 +151,12 @@ export default function SOPCycles() {
         record.stats ? (
           <div>
             <Progress
-              percent={record.stats.completionPercent}
+              percent={Math.max(0, Math.min(100, Number(record.stats.completionPercent || 0)))}
               size="small"
-              status={record.stats.completionPercent === 100 ? 'success' : 'active'}
+              status={Number(record.stats.completionPercent) === 100 ? 'success' : 'active'}
             />
             <Text type="secondary" style={{ fontSize: 12 }}>
-              {record.stats.submittedReps}/{record.stats.totalReps} reps submitted
+              {Number(record.stats.submittedReps || 0)}/{Number(record.stats.totalReps || 0)} reps submitted
             </Text>
           </div>
         ) : (
@@ -167,7 +178,7 @@ export default function SOPCycles() {
       width: 250,
       render: (_, record) => (
         <Space size="small">
-          {record.status === 'draft' && (
+          {String(record.status).toLowerCase() === 'draft' && (
             <Button
               type="primary"
               size="small"
@@ -177,7 +188,7 @@ export default function SOPCycles() {
               Open
             </Button>
           )}
-          {record.status === 'open' && (
+          {String(record.status).toLowerCase() === 'open' && (
             <>
               <Button
                 type="default"
@@ -202,6 +213,7 @@ export default function SOPCycles() {
             size="small"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
+            disabled={String(record.status).toLowerCase() === 'closed' || String(record.status).toLowerCase() === 'archived'}
           >
             Edit
           </Button>
@@ -212,7 +224,7 @@ export default function SOPCycles() {
             okText="Yes"
             cancelText="No"
           >
-            <Button type="link" danger size="small" icon={<DeleteOutlined />}>
+            <Button type="link" danger size="small" icon={<DeleteOutlined />} disabled={String(record.status).toLowerCase() === 'closed' || String(record.status).toLowerCase() === 'archived'}>
               Delete
             </Button>
           </Popconfirm>
@@ -244,8 +256,8 @@ export default function SOPCycles() {
       year: cycle.year,
       month: cycle.month,
       startDate: dayjs(cycle.dates.startDate),
-      closeDate: dayjs(cycle.dates.closeDate),
-      planningStartMonth: dayjs(cycle.dates.planningStartMonth),
+      closeDate: dayjs(cycle.dates.endDate),
+      planningStartMonth: cycle.planningStartMonth ? dayjs(cycle.planningStartMonth) : dayjs(`${cycle.planningPeriod?.startYear}-${String(cycle.planningPeriod?.startMonth || 1).padStart(2, '0')}-01`),
     });
     setIsModalOpen(true);
   };
@@ -262,29 +274,41 @@ export default function SOPCycles() {
   };
 
   const handleOpenCycle = async (id: string) => {
-    try {
-      const response = await cyclesAPI.changeStatus(id, 'OPEN');
-      setCycles(
-        cycles.map((c) => (c._id === id ? { ...c, ...response } : c))
-      );
-      message.success('Cycle opened and notifications sent to sales reps');
-    } catch (error: any) {
-      console.error('Failed to open cycle:', error);
-      message.error(error.response?.data?.detail || 'Failed to open cycle');
-    }
+    Modal.confirm({
+      title: 'Open Cycle',
+      content: 'Are you sure you want to open this cycle and notify sales reps?',
+      okText: 'Open',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          const response = await cyclesAPI.changeStatus(id, 'OPEN');
+          setCycles(cycles.map((c) => (c._id === id ? response.cycle : c)));
+          message.success('Cycle opened and notifications sent to sales reps');
+        } catch (error: any) {
+          console.error('Failed to open cycle:', error);
+          message.error(error.response?.data?.detail || 'Failed to open cycle');
+        }
+      },
+    });
   };
 
   const handleCloseCycle = async (id: string) => {
-    try {
-      const response = await cyclesAPI.changeStatus(id, 'CLOSED');
-      setCycles(
-        cycles.map((c) => (c._id === id ? { ...c, ...response } : c))
-      );
-      message.success('Cycle closed successfully');
-    } catch (error: any) {
-      console.error('Failed to close cycle:', error);
-      message.error(error.response?.data?.detail || 'Failed to close cycle');
-    }
+    Modal.confirm({
+      title: 'Close Cycle',
+      content: 'Closing a cycle will prevent further submissions. Proceed?',
+      okText: 'Close',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          const response = await cyclesAPI.changeStatus(id, 'CLOSED');
+          setCycles(cycles.map((c) => (c._id === id ? response.cycle : c)));
+          message.success('Cycle closed successfully');
+        } catch (error: any) {
+          console.error('Failed to close cycle:', error);
+          message.error(error.response?.data?.detail || 'Failed to close cycle');
+        }
+      },
+    });
   };
 
   const handleNotify = async (_id: string) => {
@@ -297,12 +321,30 @@ export default function SOPCycles() {
       setLoading(true);
       const values = await form.validateFields();
 
+      // Date validations
+      const start = dayjs(values.startDate);
+      const close = dayjs(values.closeDate);
+      const planningStart = dayjs(values.planningStartMonth);
+      if (!close.isAfter(start, 'day')) {
+        message.error('Close Date must be after Start Date');
+        setLoading(false);
+        return;
+      }
+      if (planningStart.isBefore(start, 'month')) {
+        message.error('Planning Start Month must be on/after Start Date month');
+        setLoading(false);
+        return;
+      }
+
       if (editingCycle) {
         // Update existing cycle
         const updateData = {
           cycleName: values.cycleName,
+          year: values.year,
+          month: values.month,
           startDate: values.startDate.toISOString(),
-          endDate: values.closeDate.toISOString(),
+          closeDate: values.closeDate.toISOString(),
+          planningStartMonth: values.planningStartMonth.toISOString(),
         };
 
         const updatedCycle = await cyclesAPI.update(editingCycle._id, updateData);
@@ -312,8 +354,11 @@ export default function SOPCycles() {
         // Create new cycle
         const createData = {
           cycleName: values.cycleName,
+          year: values.year,
+          month: values.month,
           startDate: values.startDate.toISOString(),
-          endDate: values.closeDate.toISOString(),
+          closeDate: values.closeDate.toISOString(),
+          planningStartMonth: values.planningStartMonth.toISOString(),
         };
 
         const newCycle = await cyclesAPI.create(createData);
@@ -425,7 +470,7 @@ export default function SOPCycles() {
                 label="Year"
                 rules={[{ required: true, message: 'Required' }]}
               >
-                <InputNumber min={2025} max={2030} style={{ width: '100%' }} />
+                <InputNumber min={dayjs().year() - 1} max={dayjs().year() + 2} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={12}>

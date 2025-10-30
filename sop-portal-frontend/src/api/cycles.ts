@@ -2,15 +2,21 @@ import axiosInstance from './axios';
 import type { SOPCycle } from '@/types';
 
 export interface CycleCreate {
-  cycleName: string;
-  startDate: string;  // ISO date string
-  endDate: string;    // ISO date string
+  cycleName?: string;
+  startDate?: string;  // ISO date string
+  endDate?: string;    // ISO date string
+  year?: number;
+  month?: number;
+  planningStartMonth?: string; // ISO date string (month anchor)
 }
 
 export interface CycleUpdate {
   cycleName?: string;
   startDate?: string;
   endDate?: string;
+  year?: number;
+  month?: number;
+  planningStartMonth?: string;
 }
 
 export interface CycleStats {
@@ -24,9 +30,9 @@ export interface CycleStats {
 export const cyclesAPI = {
   // List cycles with pagination and filters
   list: async (params?: {
-    skip?: number;
-    limit?: number;
-    status?: 'DRAFT' | 'OPEN' | 'CLOSED';
+    page?: number;
+    pageSize?: number;
+    status?: 'draft' | 'open' | 'closed';
     year?: number;
   }): Promise<{ cycles: SOPCycle[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean; hasPrev: boolean }> => {
     const response = await axiosInstance.get<{ cycles: SOPCycle[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean; hasPrev: boolean }>('/sop/cycles', { params });
@@ -63,8 +69,8 @@ export const cyclesAPI = {
   },
 
   // Change cycle status (admin only)
-  changeStatus: async (id: string, status: 'DRAFT' | 'OPEN' | 'CLOSED'): Promise<SOPCycle> => {
-    const response = await axiosInstance.put<SOPCycle>(`/sop/cycles/${id}/status`, { status });
+  changeStatus: async (id: string, status: 'DRAFT' | 'OPEN' | 'CLOSED'): Promise<{ success: boolean; message: string; cycle: SOPCycle }> => {
+    const response = await axiosInstance.put<{ success: boolean; message: string; cycle: SOPCycle }>(`/sop/cycles/${id}/status`, { status });
     return response.data;
   },
 

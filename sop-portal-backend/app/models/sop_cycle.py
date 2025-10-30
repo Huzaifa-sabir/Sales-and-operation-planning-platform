@@ -32,6 +32,10 @@ class SOPCycleBase(BaseModel):
     cycleName: str = Field(..., description="Cycle name (e.g., 'S&OP Cycle 2025-11')")
     cycleYear: int = Field(..., ge=2020, le=2100, description="Cycle year")
     cycleMonth: int = Field(..., ge=1, le=12, description="Cycle month")
+    # Frontend-driven persisted metadata (optional)
+    year: Optional[int] = Field(None, ge=2020, le=2100, description="Explicit year provided by client")
+    month: Optional[int] = Field(None, ge=1, le=12, description="Explicit month provided by client")
+    planningStartMonth: Optional[datetime] = Field(None, description="Client-provided planning start month anchor")
     status: CycleStatus = Field(default=CycleStatus.DRAFT, description="Cycle status")
     dates: CycleDates = Field(..., description="Cycle date ranges")
     planningPeriod: Dict[str, Any] = Field(..., description="16-month planning period details")
@@ -43,6 +47,9 @@ class SOPCycleCreate(BaseModel):
     cycleName: Optional[str] = None
     startDate: Optional[datetime] = None
     endDate: Optional[datetime] = None
+    year: Optional[int] = None
+    month: Optional[int] = None
+    planningStartMonth: Optional[datetime] = None
     createdBy: Optional[str] = None
 
 
@@ -52,6 +59,9 @@ class SOPCycleUpdate(BaseModel):
     status: Optional[CycleStatus] = None
     dates: Optional[CycleDates] = None
     stats: Optional[CycleStats] = None
+    year: Optional[int] = None
+    month: Optional[int] = None
+    planningStartMonth: Optional[datetime] = None
 
 
 class SOPCycleInDB(SOPCycleBase):

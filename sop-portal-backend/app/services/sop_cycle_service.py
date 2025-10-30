@@ -3,7 +3,7 @@ S&OP Cycle Service Layer
 Handles S&OP cycle management, workflow, and statistics
 """
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timedelta
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from fastapi import HTTPException, status
@@ -29,25 +29,55 @@ class SOPCycleService:
         Create a new S&OP cycle
         Returns created cycle
         """
+        # Determine start date from provided fields
+        start_date = cycle_data.startDate or (
+            datetime(cycle_data.year, cycle_data.month, 1) if getattr(cycle_data, 'year', None) and getattr(cycle_data, 'month', None) else datetime.now()
+        )
+
         # Generate cycle name if not provided
-        cycle_name = cycle_data.cycleName or generate_cycle_name(cycle_data.startDate or datetime.now())
+        cycle_name = cycle_data.cycleName or generate_cycle_name(start_date)
 
-        # Calculate 16-month period
-        start_date = cycle_data.startDate or datetime.now()
-        planning_period = calculate_16_month_period(start_date)
+        # Calculate 16-month period (anchor may use planningStartMonth if provided)
+        anchor_date = cycle_data.planningStartMonth or start_date
+        planning_period = calculate_16_month_period(anchor_date)
 
-        # Calculate submission deadline
+        # Calculate submission deadline from start_date
         submission_deadline = calculate_submission_deadline(start_date)
+
+        # Compute end of month if not provided
+        if cycle_data.endDate:
+            end_date = cycle_data.endDate
+        else:
+            next_month = (start_date.replace(day=28) + timedelta(days=4)).replace(day=1)
+            end_date = next_month - timedelta(days=1)
+
+        # Validations
+        if end_date <= start_date:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="endDate must be after startDate"
+            )
+        if getattr(cycle_data, 'planningStartMonth', None):
+            psm = cycle_data.planningStartMonth
+            if (psm.year, psm.month) < (start_date.year, start_date.month):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="planningStartMonth must be on/after startDate month"
+                )
 
         # Create cycle document
         cycle_doc = {
             "cycleName": cycle_name,
-            "cycleYear": start_date.year,
-            "cycleMonth": start_date.month,
+            "cycleYear": (cycle_data.year or start_date.year),
+            "cycleMonth": (cycle_data.month or start_date.month),
+            # Persist client-provided fields when available
+            "year": getattr(cycle_data, 'year', None),
+            "month": getattr(cycle_data, 'month', None),
+            "planningStartMonth": getattr(cycle_data, 'planningStartMonth', None),
             "status": CycleStatus.DRAFT,
             "dates": {
                 "startDate": start_date,
-                "endDate": cycle_data.endDate or (start_date.replace(day=28) if start_date.month != 12 else start_date.replace(month=1, year=start_date.year+1, day=31)),
+                "endDate": end_date,
                 "submissionDeadline": submission_deadline
             },
             "planningPeriod": planning_period,
@@ -92,6 +122,12 @@ class SOPCycleService:
 
         # Build update document
         update_data = cycle_update.model_dump(exclude_unset=True)
+
+        # If year/month updated, keep computed cycleYear/cycleMonth in sync
+        if "year" in update_data:
+            update_data["cycleYear"] = update_data["year"] or existing_cycle.cycleYear
+        if "month" in update_data:
+            update_data["cycleMonth"] = update_data["month"] or existing_cycle.cycleMonth
 
         if update_data:
             update_data["updatedAt"] = datetime.utcnow()
@@ -250,7 +286,7 @@ class SOPCycleService:
             query["status"] = status
 
         if year:
-            query["cycleYear"] = year
+            query["$or"] = [{"cycleYear": year}, {"year": year}]
 
         # Get total count
         total = await self.collection.count_documents(query)

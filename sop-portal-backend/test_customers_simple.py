@@ -37,3 +37,4 @@ async def test_list_customers():
 
 if __name__ == "__main__":
     asyncio.run(test_list_customers())
+

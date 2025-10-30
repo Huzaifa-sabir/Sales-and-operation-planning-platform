@@ -44,3 +44,4 @@ mongodb+srv://sop_portal_user:SOPPortal123!@cluster0.4owv6bf.mongodb.net/?retryW
 - Keep the password secure
 - The user needs read/write permissions
 - Network access must allow your IP or 0.0.0.0/0
+
