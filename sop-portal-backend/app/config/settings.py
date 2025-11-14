@@ -51,10 +51,10 @@ class Settings(BaseSettings):
     CYCLE_REMINDER_DAYS: int = 5
 
     # Admin User (Initial)
-    ADMIN_USERNAME: str = "admin"
-    ADMIN_EMAIL: str = "admin@heavygarlic.com"
+    ADMIN_USERNAME: str = "lpolo"
+    ADMIN_EMAIL: str = "lpolo@garlandfood.net"
     ADMIN_PASSWORD: str = "admin123"
-    ADMIN_FULL_NAME: str = "Admin User"
+    ADMIN_FULL_NAME: str = "L Polo"
 
     model_config = SettingsConfigDict(
         env_file=".env",
