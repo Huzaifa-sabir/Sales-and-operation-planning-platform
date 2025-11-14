@@ -77,12 +77,27 @@ export default function ForecastEntry() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Fetch active cycle on mount
+  // Fetch active cycle and customers on mount
   useEffect(() => {
     fetchActiveCycle();
     fetchCustomers();
-    fetchProducts();
+    // Don't fetch products until customer is selected
   }, []);
+
+  // Fetch products when customer is selected
+  useEffect(() => {
+    if (selectedCustomer) {
+      // Get customerId from the selected customer _id
+      const customer = customers.find(c => c._id === selectedCustomer);
+      if (customer?.customerId) {
+        fetchProducts(customer.customerId);
+      }
+    } else {
+      // Clear products when no customer selected
+      setProducts([]);
+      setSelectedProduct(undefined);
+    }
+  }, [selectedCustomer, customers]);
 
   const fetchActiveCycle = async () => {
     try {
@@ -99,21 +114,67 @@ export default function ForecastEntry() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await customersAPI.getAll({ page: 1, limit: 100, isActive: true });
-      setCustomers(response.customers);
+      // Fetch all customers by looping through pages
+      let allCustomers: Customer[] = [];
+      let page = 1;
+      let hasMore = true;
+      const pageSize = 1000;
+      
+      while (hasMore) {
+        const result = await customersAPI.getAll({ page, limit: pageSize, isActive: true });
+        if (result.customers && result.customers.length > 0) {
+          allCustomers = [...allCustomers, ...result.customers];
+          hasMore = result.hasNext === true && result.customers.length === pageSize;
+          page++;
+        } else {
+          hasMore = false;
+        }
+        if (page > 100) break; // Safety limit
+      }
+      
+      console.log(`Loaded ${allCustomers.length} customers`);
+      setCustomers(allCustomers);
     } catch (error: any) {
       console.error('Failed to fetch customers:', error);
       message.error('Failed to load customers');
     }
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (customerId?: string) => {
     try {
-      const response = await productsAPI.getAll({ page: 1, limit: 100, isActive: true });
-      setProducts(response.products);
+      if (!customerId) {
+        // No customer selected, clear products
+        setProducts([]);
+        return;
+      }
+      
+      // Fetch products filtered by customer using product-customer matrix
+      console.log(`Loading products for customer: ${customerId}`);
+      let allProducts: Product[] = [];
+      let page = 1;
+      let hasMore = true;
+      
+      while (hasMore) {
+        const result = await productsAPI.getByCustomer(customerId, { page, limit: 1000, isActive: true });
+        console.log(`Page ${page}: Received ${result.products?.length || 0} products`);
+        
+        if (result.products && result.products.length > 0) {
+          allProducts = [...allProducts, ...result.products];
+          hasMore = result.hasNext === true && result.products.length === 1000;
+          page++;
+        } else {
+          hasMore = false;
+        }
+        
+        if (page > 100) break; // Safety limit
+      }
+      
+      console.log(`Total products loaded for customer ${customerId}: ${allProducts.length}`);
+      setProducts(allProducts);
     } catch (error: any) {
       console.error('Failed to fetch products:', error);
-      message.error('Failed to load products');
+      message.error('Failed to load products for this customer');
+      setProducts([]);
     }
   };
 
@@ -492,19 +553,25 @@ export default function ForecastEntry() {
                 placeholder="Select Customer"
                 style={{ width: '100%' }}
                 size="large"
+                showSearch
                 value={selectedCustomer}
                 onChange={(value) => {
                   setSelectedCustomer(value);
+                  setSelectedProduct(undefined); // Clear product selection when customer changes
                   setIsSubmitted(false);
                 }}
                 disabled={isSubmitted || saving}
+                optionFilterProp="label"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
                 options={customers.map((c) => ({
                   label: `${c.sopCustomerName || c.customerName} (${c.customerId})`,
                   value: c._id,
                 }))}
               />
               <Select
-                placeholder="Select Product"
+                placeholder={selectedCustomer ? "Select Product" : "Select customer first"}
                 style={{ width: '100%' }}
                 size="large"
                 value={selectedProduct}
@@ -512,11 +579,17 @@ export default function ForecastEntry() {
                   setSelectedProduct(value);
                   setIsSubmitted(false);
                 }}
-                disabled={isSubmitted || saving}
+                disabled={!selectedCustomer || isSubmitted || saving}
+                loading={!selectedCustomer && products.length === 0}
                 options={products.map((p) => ({
                   label: `${p.itemCode} - ${p.itemDescription}`,
                   value: p._id,
                 }))}
+                notFoundContent={
+                  selectedCustomer 
+                    ? (products.length === 0 ? "No active products found for this customer" : "No products found")
+                    : "Please select a customer first"
+                }
               />
             </Space>
           </Card>

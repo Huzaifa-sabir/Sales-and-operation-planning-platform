@@ -47,7 +47,10 @@ export const cyclesAPI = {
 
   // Get current active cycle
   getCurrent: async (): Promise<SOPCycle | null> => {
-    const response = await axiosInstance.get<SOPCycle | null>('/sop/cycles/active');
+    const response = await axiosInstance.get<SOPCycle | null>('/sop/cycles/active', {
+      params: { _t: Date.now() }, // Cache busting
+      headers: { 'Cache-Control': 'no-cache' }
+    });
     return response.data;
   },
 

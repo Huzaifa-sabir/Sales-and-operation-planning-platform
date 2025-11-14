@@ -59,6 +59,14 @@ export default function CustomerList() {
     queryFn: () => customersAPI.getAll(filters),
   });
 
+  // Fetch statistics
+  const {
+    data: statsData,
+  } = useQuery({
+    queryKey: ['customers-statistics'],
+    queryFn: () => customersAPI.getStatistics(),
+  });
+
   const customers = customersData?.customers || [];
   const total = customersData?.total || 0;
 
@@ -67,6 +75,7 @@ export default function CustomerList() {
     mutationFn: customersAPI.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customers-statistics'] });
       message.success('Customer created successfully');
       setIsModalOpen(false);
       form.resetFields();
@@ -81,6 +90,7 @@ export default function CustomerList() {
       customersAPI.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customers-statistics'] });
       message.success('Customer updated successfully');
       setIsModalOpen(false);
       setEditingCustomer(null);
@@ -95,6 +105,7 @@ export default function CustomerList() {
     mutationFn: customersAPI.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customers-statistics'] });
       message.success('Customer deleted successfully');
     },
     onError: (error: any) => {
@@ -113,11 +124,11 @@ export default function CustomerList() {
 
   // Backend handles filtering, no need for client-side filtering
 
-  // Statistics
+  // Statistics from API
   const stats = {
-    total: customers.length,
-    active: customers.filter((c) => c.isActive).length,
-    totalSales: customers.reduce((sum, c) => sum + (c.metadata?.totalSalesYTD || 0), 0),
+    total: statsData?.total || 0,
+    active: statsData?.active || 0,
+    totalSales: statsData?.totalYtdSales || 0,
   };
 
   const columns: ColumnsType<Customer> = [

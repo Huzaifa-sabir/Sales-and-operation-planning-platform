@@ -18,3 +18,4 @@ echo Frontend will be available at http://localhost:5173
 echo Backend should be running at http://localhost:8000
 echo.
 npm run dev
+

@@ -30,6 +30,8 @@ export const salesHistoryAPI = {
   list: async (params?: {
     skip?: number;
     limit?: number;
+    page?: number;
+    pageSize?: number;
     customerId?: string;
     productId?: string;
     salesRepId?: string;
@@ -37,8 +39,8 @@ export const salesHistoryAPI = {
     month?: number;
     startDate?: string;
     endDate?: string;
-  }): Promise<PaginatedResponse<SalesHistory>> => {
-    const response = await axiosInstance.get<PaginatedResponse<SalesHistory>>('/sales-history', { params });
+  }): Promise<PaginatedResponse<SalesHistory> | { records: SalesHistory[], total: number, page: number, pageSize: number, totalPages: number, hasNext: boolean, hasPrev: boolean }> => {
+    const response = await axiosInstance.get<PaginatedResponse<SalesHistory> | { records: SalesHistory[], total: number, page: number, pageSize: number, totalPages: number, hasNext: boolean, hasPrev: boolean }>('/sales-history', { params });
     return response.data;
   },
 

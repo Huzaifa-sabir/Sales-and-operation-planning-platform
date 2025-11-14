@@ -33,6 +33,8 @@ import {
 } from '@ant-design/icons';
 import type { SalesHistory as SalesHistoryType } from '@/types';
 import { salesHistoryAPI } from '@/api/salesHistory';
+import { customersAPI } from '@/api/customers';
+import { productsAPI } from '@/api/products';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -57,13 +59,68 @@ const getMonthlyTotals = (data: SalesHistoryType[]) => {
 export default function SalesHistory() {
   const [salesData, setSalesData] = useState<SalesHistoryType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [customers, setCustomers] = useState<Array<{label: string, value: string}>>([]);
+  const [products, setProducts] = useState<Array<{label: string, value: string}>>([]);
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<string | undefined>();
   const [selectedProduct, setSelectedProduct] = useState<string | undefined>();
   const [pagination, setPagination] = useState({
     page: 1,
-    pageSize: 100,
+    pageSize: 200, // Fetch more records initially
     total: 0,
+    totalPages: 0,
   });
+  
+  const [tablePagination, setTablePagination] = useState({
+    current: 1,
+    pageSize: 20,
+  });
+
+  const fetchCustomers = async () => {
+    try {
+      setLoadingCustomers(true);
+      const result = await customersAPI.getAll({ page: 1, limit: 1000, isActive: true });
+      const customerOptions = (result.customers || []).map(c => ({
+        label: `${c.customerName} (${c.customerId})`,
+        value: c.customerId
+      }));
+      setCustomers(customerOptions);
+    } catch (error) {
+      console.error('Failed to fetch customers:', error);
+    } finally {
+      setLoadingCustomers(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      // Fetch in batches since backend limit is 100 per page
+      let allProducts: any[] = [];
+      let page = 1;
+      let hasMore = true;
+      
+      while (hasMore) {
+        const result = await productsAPI.getAll({ page, limit: 100, isActive: true });
+        allProducts = [...allProducts, ...(result.products || [])];
+        hasMore = result.hasNext || false;
+        page++;
+        if (page > 100) break; // Safety limit
+      }
+      
+      const productOptions = allProducts.map(p => ({
+        label: `${p.itemCode} - ${p.itemDescription}`,
+        value: p.itemCode
+      }));
+      setProducts(productOptions);
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      message.error('Failed to load products');
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
 
   const fetchSalesHistory = async () => {
     try {
@@ -76,10 +133,12 @@ export default function SalesHistory() {
       });
 
       // Backend returns 'records' not 'data'
-      setSalesData((response as any).records || response.data || []);
+      const records = (response as any).records || response.data || [];
+      setSalesData(records);
       setPagination(prev => ({
         ...prev,
         total: response.total || 0,
+        totalPages: response.totalPages || Math.ceil((response.total || 0) / prev.pageSize),
       }));
     } catch (error) {
       console.error('Failed to fetch sales history:', error);
@@ -89,27 +148,35 @@ export default function SalesHistory() {
     }
   };
 
-  // Fetch sales history from backend
+  // Fetch customers and products on mount
+  useEffect(() => {
+    fetchCustomers();
+    fetchProducts();
+  }, []);
+
+  // Fetch sales history from backend when filters or pagination changes
   useEffect(() => {
     fetchSalesHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCustomer, selectedProduct, pagination.page]);
+  }, [selectedCustomer, selectedProduct, pagination.page, pagination.pageSize]);
 
   // Data is already filtered by backend, so use as is
   const filteredData = salesData;
 
-  // Calculate statistics
+  // Calculate statistics from all loaded data (we'll need to fetch all for accurate stats)
   const stats = {
-    totalSales: filteredData.reduce((sum, item) => sum + item.totalSales, 0),
-    totalQuantity: filteredData.reduce((sum, item) => sum + item.quantity, 0),
-    avgPrice: filteredData.length > 0 ? filteredData.reduce((sum, item) => sum + item.unitPrice, 0) / filteredData.length : 0,
+    totalSales: filteredData.reduce((sum, item) => sum + (item.totalSales || 0), 0),
+    totalQuantity: filteredData.reduce((sum, item) => sum + (item.quantity || 0), 0),
+    avgPrice: filteredData.length > 0 ? filteredData.reduce((sum, item) => sum + (item.unitPrice || 0), 0) / filteredData.length : 0,
     grossProfit: filteredData.reduce((sum, item) => sum + (item.grossProfit || 0), 0),
   };
 
-  // Get last 6 months for detailed view
-  const last6Months = filteredData
-    .sort((a, b) => new Date(b.yearMonth).getTime() - new Date(a.yearMonth).getTime())
-    .slice(0, 18);
+  // Use all filtered data, sorted by date (newest first)
+  const sortedData = [...filteredData].sort((a, b) => {
+    const dateA = new Date(a.yearMonth || `${a.year}-${String(a.month).padStart(2, '0')}`).getTime();
+    const dateB = new Date(b.yearMonth || `${b.year}-${String(b.month).padStart(2, '0')}`).getTime();
+    return dateB - dateA;
+  });
 
   const chartData = getMonthlyTotals(filteredData);
 
@@ -279,27 +346,29 @@ export default function SalesHistory() {
               <Space wrap>
                 <Select
                   placeholder="Filter by Customer"
-                  style={{ width: 200 }}
+                  style={{ width: 300 }}
                   allowClear
+                  showSearch
+                  loading={loadingCustomers}
                   value={selectedCustomer}
                   onChange={setSelectedCustomer}
-                  options={[
-                    { label: 'Industria Los Patitos', value: 'Industria Los Patitos' },
-                    { label: 'Canadawide', value: 'Canadawide' },
-                    { label: 'A&A Organic', value: 'A&A Organic' },
-                  ]}
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  options={customers}
                 />
                 <Select
                   placeholder="Filter by Product"
-                  style={{ width: 200 }}
+                  style={{ width: 350 }}
                   allowClear
+                  showSearch
+                  loading={loadingProducts}
                   value={selectedProduct}
                   onChange={setSelectedProduct}
-                  options={[
-                    { label: '110001 - Peeled Garlic 12x1 LB', value: '110001' },
-                    { label: '110002 - Peeled Garlic 12x3 LB', value: '110002' },
-                    { label: '130030 - Garlic Puree 40 LB', value: '130030' },
-                  ]}
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  options={products}
                 />
               </Space>
             </Col>
@@ -334,12 +403,29 @@ export default function SalesHistory() {
 
           <Table
             columns={columns}
-            dataSource={last6Months}
-            rowKey="_id"
+            dataSource={sortedData}
+            rowKey={(record) => record.id || record._id || `${record.customerId}-${record.productId}-${record.year}-${record.month}`}
             scroll={{ x: 1200 }}
+            loading={loading}
             pagination={{
-              pageSize: 20,
-              showTotal: (total) => `Total ${total} records`,
+              current: tablePagination.current,
+              pageSize: tablePagination.pageSize,
+              total: sortedData.length, // Total records in current fetch
+              showTotal: (total, range) => {
+                const totalFromServer = pagination.total;
+                if (totalFromServer > total) {
+                  return `Showing ${range[0]}-${range[1]} of ${total} loaded (${totalFromServer} total)`;
+                }
+                return `Showing ${range[0]}-${range[1]} of ${total} records`;
+              },
+              showSizeChanger: true,
+              pageSizeOptions: ['20', '50', '100', '200'],
+              onChange: (page, pageSize) => {
+                setTablePagination({ current: page, pageSize });
+              },
+              onShowSizeChange: (current, size) => {
+                setTablePagination({ current: 1, pageSize: size });
+              },
             }}
           />
         </Space>

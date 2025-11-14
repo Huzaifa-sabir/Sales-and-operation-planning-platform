@@ -30,10 +30,12 @@ import {
 import type { Product, ProductFormData } from '@/types';
 import ProductForm from '@/components/forms/ProductForm';
 import { productsAPI } from '@/api/products';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { Title } = Typography;
 
 export default function ProductList() {
+  const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [products, setProducts] = useState<Product[]>([]);
   const [searchText, setSearchText] = useState('');
@@ -48,6 +50,14 @@ export default function ProductList() {
   useEffect(() => {
     fetchProducts();
   }, [searchText, selectedGroup, selectedLocation, pagination.page]);
+
+  // Fetch statistics
+  const {
+    data: statsData,
+  } = useQuery({
+    queryKey: ['products-statistics'],
+    queryFn: () => productsAPI.getStatistics(),
+  });
 
   const fetchProducts = async () => {
     try {
@@ -69,11 +79,11 @@ export default function ProductList() {
     }
   };
 
-  // Statistics
+  // Statistics from API
   const stats = {
-    total: pagination.total,
-    active: products.filter((p) => p.isActive).length,
-    groups: new Set(products.map((p) => p.group?.code).filter(Boolean)).size,
+    total: statsData?.total || 0,
+    active: statsData?.active || 0,
+    groups: statsData?.groups || 0,
   };
 
   const columns: ColumnsType<Product> = [
@@ -194,6 +204,7 @@ export default function ProductList() {
       await productsAPI.delete(id);
       message.success('Product deleted successfully');
       fetchProducts();
+      queryClient.invalidateQueries({ queryKey: ['products-statistics'] });
     } catch (error) {
       message.error('Failed to delete product');
       console.error('Error deleting product:', error);
@@ -239,6 +250,7 @@ export default function ProductList() {
       setIsModalOpen(false);
       form.resetFields();
       fetchProducts();
+      queryClient.invalidateQueries({ queryKey: ['products-statistics'] });
     } catch (error) {
       message.error('Failed to save product');
       console.error('Form submission error:', error);
@@ -252,6 +264,7 @@ export default function ProductList() {
       const result = await productsAPI.importExcel(file);
       message.success(`Imported ${result.successful} products successfully`);
       fetchProducts();
+      queryClient.invalidateQueries({ queryKey: ['products-statistics'] });
       return false; // Prevent default upload
     } catch (error) {
       message.error('Failed to import Excel file');

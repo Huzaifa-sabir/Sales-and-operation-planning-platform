@@ -52,3 +52,4 @@ echo.
 echo Run 'start_all.bat' to start development servers
 echo.
 pause
+

@@ -38,3 +38,4 @@ echo - If you see "Access-Control-Allow-Origin" headers, CORS is working
 echo - If you see "No 'Access-Control-Allow-Origin' header", CORS is broken
 echo ========================================
 pause
+

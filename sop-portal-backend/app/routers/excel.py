@@ -3,7 +3,7 @@ Excel Import/Export Router
 Handles Excel file upload/download for bulk operations
 """
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Query
 from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime
@@ -85,7 +85,7 @@ async def download_matrix_template(
     )
 
 
-# ==================== DATA EXPORTS ====================
+# ==================== EXPORTS ====================
 
 @router.get(
     "/export/customers",
@@ -93,55 +93,31 @@ async def download_matrix_template(
     description="Export all customers to Excel file"
 )
 async def export_customers(
-    isActive: Optional[bool] = None,
     db: AsyncIOMotorDatabase = Depends(get_db),
-    current_user: UserInDB = Depends(get_current_active_user)
+    current_user: UserInDB = Depends(require_admin)
 ):
-    """Export customers to Excel"""
-    try:
-        customer_service = CustomerService(db)
+    """
+    Export customers to Excel file (Admin only)
+    
+    Returns an Excel file with all customers in the system.
+    """
+    customer_service = CustomerService(db)
+    customers_result = await customer_service.list_customers(
+        skip=0,
+        limit=10000  # Get all customers
+    )
+    customers = customers_result.get("customers", [])
 
-        # Get all customers
-        result = await customer_service.list_customers(
-            skip=0,
-            limit=1000,  # Reduced limit to avoid timeout
-            is_active=isActive
-        )
+    # Generate Excel file
+    excel_file = ExcelService.export_customers(customers)
 
-        # Convert to dict format
-        customers_data = [
-            {
-                "customerId": c.customerId,
-                "customerName": c.customerName,
-                "contactPerson": c.contactPerson,
-                "contactEmail": c.contactEmail,
-                "contactPhone": c.contactPhone,
-                "location": c.location.model_dump() if c.location else None,
-                "paymentTerms": getattr(c, 'paymentTerms', None),
-                "creditLimit": getattr(c, 'creditLimit', None),
-                "isActive": c.isActive,
-                "createdAt": c.createdAt
-            }
-            for c in result["customers"]
-        ]
-
-        excel_file = ExcelService.export_customers(customers_data)
-
-        return StreamingResponse(
-            excel_file,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": f"attachment; filename=customers_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-            }
-        )
-    except Exception as e:
-        print(f"Export error: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Export failed: {str(e)}"
-        )
+    return StreamingResponse(
+        excel_file,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename=customers_export_{datetime.now().strftime('%Y%m%d')}.xlsx"
+        }
+    )
 
 
 @router.get(
@@ -150,43 +126,29 @@ async def export_customers(
     description="Export all products to Excel file"
 )
 async def export_products(
-    isActive: Optional[bool] = None,
     db: AsyncIOMotorDatabase = Depends(get_db),
-    current_user: UserInDB = Depends(get_current_active_user)
+    current_user: UserInDB = Depends(require_admin)
 ):
-    """Export products to Excel"""
+    """
+    Export products to Excel file (Admin only)
+    
+    Returns an Excel file with all products in the system.
+    """
     product_service = ProductService(db)
-
-    # Get all products
-    result = await product_service.list_products(
+    products_result = await product_service.list_products(
         skip=0,
-        limit=10000,  # Get all
-        is_active=isActive
+        limit=10000  # Get all products
     )
+    products = products_result.get("products", [])
 
-    # Convert to dict format
-    products_data = [
-        {
-            "itemCode": p.itemCode,
-            "description": p.description,
-            "group": p.group.model_dump() if p.group else None,
-            "manufacturing": p.manufacturing.model_dump() if p.manufacturing else None,
-            "pricing": p.pricing.model_dump() if p.pricing else None,
-            "weight": p.weight,
-            "uom": p.uom,
-            "isActive": p.isActive,
-            "createdAt": p.createdAt
-        }
-        for p in result["products"]
-    ]
-
-    excel_file = ExcelService.export_products(products_data)
+    # Generate Excel file
+    excel_file = ExcelService.export_products(products)
 
     return StreamingResponse(
         excel_file,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            "Content-Disposition": f"attachment; filename=products_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            "Content-Disposition": f"attachment; filename=products_export_{datetime.now().strftime('%Y%m%d')}.xlsx"
         }
     )
 
@@ -194,44 +156,39 @@ async def export_products(
 @router.get(
     "/export/sales-history",
     summary="Export sales history to Excel",
-    description="Export filtered sales history records to Excel file"
+    description="Export sales history data to Excel file"
 )
 async def export_sales_history(
-    customerId: Optional[str] = None,
-    productId: Optional[str] = None,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
-    limit: int = 1000,
+    start_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
     db: AsyncIOMotorDatabase = Depends(get_db),
-    current_user: UserInDB = Depends(get_current_active_user)
+    current_user: UserInDB = Depends(require_admin)
 ):
-    """Export sales history to Excel with optional filters"""
-    sales_service = SalesHistoryService(db)
-
-    result = await sales_service.get_sales_history(
-        skip=0,
-        limit=min(max(limit, 1), 5000),
-        customer_id=customerId,
-        product_id=productId,
-        year=year,
-        month=month,
+    """
+    Export sales history to Excel file (Admin only)
+    
+    Returns an Excel file with sales history data.
+    """
+    sales_history_service = SalesHistoryService(db)
+    sales_data = await sales_history_service.get_sales_history(
+        start_date=start_date,
+        end_date=end_date,
+        limit=100000
     )
 
-    # Convert result records to dicts
-    records = [r.model_dump(by_alias=True) for r in result["records"]]
-
-    excel_file = ExcelService.export_sales_history(records)
+    # Generate Excel file
+    excel_file = ExcelService.export_sales_history(sales_data.get("data", []))
 
     return StreamingResponse(
         excel_file,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            "Content-Disposition": f"attachment; filename=sales_history_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            "Content-Disposition": f"attachment; filename=sales_history_export_{datetime.now().strftime('%Y%m%d')}.xlsx"
         }
     )
 
 
-# ==================== DATA IMPORTS ====================
+# ==================== IMPORTS ====================
 
 @router.post(
     "/import/customers",
@@ -283,6 +240,7 @@ async def import_customers(
                 })
             except Exception as e:
                 import_errors.append({
+                    "row": idx + 2,  # +2 because Excel rows start at 1 and we skip header
                     "customerId": customer_data.get("customerId"),
                     "error": str(e)
                 })
@@ -353,10 +311,11 @@ async def import_products(
                 created_product = await product_service.create_product(product_create)
                 created.append({
                     "itemCode": created_product.itemCode,
-                    "description": created_product.description
+                    "itemDescription": created_product.itemDescription
                 })
             except Exception as e:
                 import_errors.append({
+                    "row": idx + 2,
                     "itemCode": product_data.get("itemCode"),
                     "error": str(e)
                 })
@@ -453,4 +412,79 @@ async def import_matrix(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing file: {str(e)}"
+        )
+
+
+@router.post(
+    "/import-all",
+    summary="Import all data from consolidated Excel file",
+    description="Upload consolidated Excel file to import customers, products, matrix, and sales history. Admin only."
+)
+async def import_all_data(
+    file: UploadFile = File(..., description="Consolidated Excel file with customer sheets"),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    current_user: UserInDB = Depends(require_admin)
+):
+    """
+    Import all data from consolidated Excel file (Admin only)
+    
+    This endpoint imports:
+    - Customers (from sheet names)
+    - Products (from all customer sheets)
+    - Product-Customer Matrix (products per customer)
+    - Sales History (if available in Summary sheet)
+    """
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be an Excel file (.xlsx or .xls)"
+        )
+    
+    try:
+        # Save uploaded file temporarily
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp_file:
+            contents = await file.read()
+            tmp_file.write(contents)
+            tmp_file_path = tmp_file.name
+        
+        try:
+            # Import using the script
+            import sys
+            from pathlib import Path
+            scripts_path = Path(__file__).parent.parent / 'scripts'
+            sys.path.insert(0, str(scripts_path))
+            
+            from import_excel_data import ExcelDataImporter
+            importer = ExcelDataImporter(db)
+            
+            # Import data
+            await importer.import_all_from_file(tmp_file_path)
+            
+            return {
+                "success": True,
+                "message": "Data imported successfully",
+                "summary": {
+                    "customers_created": importer.stats['customers_created'],
+                    "customers_updated": importer.stats['customers_updated'],
+                    "products_created": importer.stats['products_created'],
+                    "products_updated": importer.stats['products_updated'],
+                    "matrix_entries_created": importer.stats['matrix_entries_created'],
+                    "sales_history_created": importer.stats['sales_history_created'],
+                    "errors": len(importer.stats['errors'])
+                },
+                "errors": importer.stats['errors'][:50]  # First 50 errors
+            }
+        finally:
+            # Clean up temp file
+            if os.path.exists(tmp_file_path):
+                os.unlink(tmp_file_path)
+                
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error importing data: {str(e)}"
         )

@@ -343,13 +343,16 @@ export default function SOPCycles() {
           year: values.year,
           month: values.month,
           startDate: values.startDate.toISOString(),
-          closeDate: values.closeDate.toISOString(),
+          endDate: values.closeDate.toISOString(), // Backend expects endDate, not closeDate
           planningStartMonth: values.planningStartMonth.toISOString(),
         };
 
         const updatedCycle = await cyclesAPI.update(editingCycle._id, updateData);
-        setCycles(cycles.map((c) => (c._id === editingCycle._id ? updatedCycle : c)));
+        // Refresh list to ensure we have latest data from server
+        await fetchCycles();
         message.success('Cycle updated successfully');
+        setIsModalOpen(false);
+        form.resetFields();
       } else {
         // Create new cycle
         const createData = {
@@ -357,7 +360,7 @@ export default function SOPCycles() {
           year: values.year,
           month: values.month,
           startDate: values.startDate.toISOString(),
-          closeDate: values.closeDate.toISOString(),
+          endDate: values.closeDate.toISOString(), // Backend expects endDate, not closeDate
           planningStartMonth: values.planningStartMonth.toISOString(),
         };
 

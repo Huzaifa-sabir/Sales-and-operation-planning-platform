@@ -35,3 +35,4 @@ You can also check what environment variables are currently set in Render:
 2. Look for existing `CORS_ORIGINS` variable
 3. If it exists, update it with the new value
 4. If it doesn't exist, add it as described above
+

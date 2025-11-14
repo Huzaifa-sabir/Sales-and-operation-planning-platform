@@ -13,6 +13,7 @@ import ForecastEntry from './pages/sop/ForecastEntry';
 import Reports from './pages/reports/Reports';
 import UserManagement from './pages/admin/UserManagement';
 import Settings from './pages/admin/Settings';
+import ProductCustomerMatrix from './pages/admin/ProductCustomerMatrix';
 import Layout from './components/common/Layout';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { ROUTES, ROLES } from './config/constants';
@@ -113,6 +114,16 @@ function App() {
                 element={
                   <ProtectedRoute requireRoles={[ROLES.ADMIN]}>
                     <Settings />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Admin - Product-Customer Matrix */}
+              <Route
+                path="admin/matrix"
+                element={
+                  <ProtectedRoute requireRoles={[ROLES.ADMIN]}>
+                    <ProductCustomerMatrix />
                   </ProtectedRoute>
                 }
               />

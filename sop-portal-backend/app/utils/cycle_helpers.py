@@ -96,15 +96,23 @@ def generate_cycle_name(start_date: datetime = None) -> str:
     return f"S&OP Cycle {start_date.strftime('%Y-%m')}"
 
 
-def calculate_submission_deadline(cycle_start: datetime, days_before_end: int = 7) -> datetime:
+def calculate_submission_deadline(cycle_start: datetime, days_before_end: int = 7, cycle_end: datetime | None = None) -> datetime:
     """
-    Calculate submission deadline
-    Typically a few days before the cycle closes
+    Calculate submission deadline.
+    Prefer provided cycle_end (dates.endDate) when available, otherwise derive from cycle_start.
+    The deadline is set to 23:59:59 of (cycle_end - days_before_end).
     """
-    # Cycle typically runs for 1 month
-    cycle_end = cycle_start + relativedelta(months=1)
-    deadline = cycle_end - relativedelta(days=days_before_end)
+    # Prefer explicit end date
+    if cycle_end is None:
+        # Derive end as the last day of the start month
+        derived_end = (cycle_start.replace(day=28) + relativedelta(days=4))  # next month
+        derived_end = derived_end.replace(day=1) - relativedelta(days=1)  # last day of start month
+        cycle_end = derived_end
 
+    # Compute deadline date
+    deadline_date = cycle_end - relativedelta(days=days_before_end)
+    # Set to end of day to avoid off-by-one display
+    deadline = deadline_date.replace(hour=23, minute=59, second=59, microsecond=0)
     return deadline
 
 

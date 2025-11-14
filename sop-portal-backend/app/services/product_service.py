@@ -33,12 +33,21 @@ class ProductService:
             )
 
         # Create product document
+        # Ensure pricing has required fields
+        pricing_data = None
+        if product_data.pricing:
+            pricing_data = product_data.pricing.model_dump()
+            if "avgPrice" not in pricing_data or pricing_data.get("avgPrice") is None:
+                pricing_data["avgPrice"] = 0.0
+            if "currency" not in pricing_data:
+                pricing_data["currency"] = "USD"
+        
         product_doc = {
             "itemCode": product_data.itemCode,
             "itemDescription": product_data.itemDescription,
             "group": product_data.group.model_dump() if product_data.group else None,
             "manufacturing": product_data.manufacturing.model_dump() if product_data.manufacturing else None,
-            "pricing": product_data.pricing.model_dump() if product_data.pricing else None,
+            "pricing": pricing_data,
             "weight": product_data.weight,
             "uom": product_data.uom,
             "isActive": True,
@@ -61,6 +70,12 @@ class ProductService:
                 # Handle field name migration
                 if "description" in product_doc and "itemDescription" not in product_doc:
                     product_doc["itemDescription"] = product_doc["description"]
+                # Ensure pricing has required fields
+                if product_doc.get("pricing"):
+                    if "avgPrice" not in product_doc["pricing"] or product_doc["pricing"].get("avgPrice") is None:
+                        product_doc["pricing"]["avgPrice"] = 0.0
+                    if "currency" not in product_doc["pricing"]:
+                        product_doc["pricing"]["currency"] = "USD"
                 return ProductInDB(**product_doc)
             return None
         except Exception:
@@ -74,6 +89,12 @@ class ProductService:
             # Handle field name migration
             if "description" in product_doc and "itemDescription" not in product_doc:
                 product_doc["itemDescription"] = product_doc["description"]
+            # Ensure pricing has required fields
+            if product_doc.get("pricing"):
+                if "avgPrice" not in product_doc["pricing"] or product_doc["pricing"].get("avgPrice") is None:
+                    product_doc["pricing"]["avgPrice"] = 0.0
+                if "currency" not in product_doc["pricing"]:
+                    product_doc["pricing"]["currency"] = "USD"
             return ProductInDB(**product_doc)
         return None
 
@@ -103,6 +124,12 @@ class ProductService:
         for field in ["group", "manufacturing", "pricing"]:
             if field in update_data and update_data[field]:
                 update_data[field] = update_data[field].model_dump()
+                # Ensure pricing has required fields
+                if field == "pricing" and update_data[field]:
+                    if "avgPrice" not in update_data[field] or update_data[field].get("avgPrice") is None:
+                        update_data[field]["avgPrice"] = 0.0
+                    if "currency" not in update_data[field]:
+                        update_data[field]["currency"] = "USD"
 
         if update_data:
             update_data["updatedAt"] = datetime.utcnow()
@@ -186,11 +213,17 @@ class ProductService:
 
             product_ids = [doc["productId"] for doc in matrix_docs]
 
+            # Debug: Log the filtering
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.debug(f"Filtering products for customer_id={customer_id}, found {len(product_ids)} products in matrix: {product_ids[:10]}")
+
             if product_ids:
                 # Filter products to only those in the matrix
                 query["itemCode"] = {"$in": product_ids}
             else:
                 # No products available for this customer
+                logger.debug(f"No active products found in matrix for customer_id={customer_id}")
                 return {
                     "products": [],
                     "total": 0,
@@ -203,10 +236,23 @@ class ProductService:
 
         if search:
             # Search in itemCode, itemDescription
-            query["$or"] = [
-                {"itemCode": {"$regex": search, "$options": "i"}},
-                {"itemDescription": {"$regex": search, "$options": "i"}}
-            ]
+            # If customer_id is set, we need to combine search with the existing itemCode filter
+            if customer_id and "itemCode" in query:
+                # Customer filter already applied, add search to filter within those products
+                search_query = {
+                    "$or": [
+                        {"itemCode": {"$regex": search, "$options": "i"}},
+                        {"itemDescription": {"$regex": search, "$options": "i"}}
+                    ]
+                }
+                # Combine with existing query using $and
+                query = {"$and": [query, search_query]}
+            else:
+                # No customer filter, just add search
+                query["$or"] = [
+                    {"itemCode": {"$regex": search, "$options": "i"}},
+                    {"itemDescription": {"$regex": search, "$options": "i"}}
+                ]
 
         # Get total count
         total = await self.collection.count_documents(query)
@@ -231,7 +277,19 @@ class ProductService:
                     # Add customer-specific pricing to product
                     if not product_doc.get("pricing"):
                         product_doc["pricing"] = {}
+                    # Ensure avgPrice exists (required field)
+                    if "avgPrice" not in product_doc["pricing"] or product_doc["pricing"].get("avgPrice") is None:
+                        product_doc["pricing"]["avgPrice"] = 0.0
+                    if "currency" not in product_doc["pricing"]:
+                        product_doc["pricing"]["currency"] = "USD"
                     product_doc["pricing"]["customerSpecificPrice"] = matrix_doc["customerPrice"]
+            
+            # Ensure pricing has required fields before creating ProductInDB
+            if product_doc.get("pricing"):
+                if "avgPrice" not in product_doc["pricing"] or product_doc["pricing"].get("avgPrice") is None:
+                    product_doc["pricing"]["avgPrice"] = 0.0
+                if "currency" not in product_doc["pricing"]:
+                    product_doc["pricing"]["currency"] = "USD"
 
             products.append(ProductInDB(**product_doc))
 
@@ -287,7 +345,19 @@ class ProductService:
                 if matrix_doc and matrix_doc.get("customerPrice"):
                     if not product_doc.get("pricing"):
                         product_doc["pricing"] = {}
+                    # Ensure avgPrice exists (required field)
+                    if "avgPrice" not in product_doc["pricing"] or product_doc["pricing"].get("avgPrice") is None:
+                        product_doc["pricing"]["avgPrice"] = 0.0
+                    if "currency" not in product_doc["pricing"]:
+                        product_doc["pricing"]["currency"] = "USD"
                     product_doc["pricing"]["customerSpecificPrice"] = matrix_doc["customerPrice"]
+            
+            # Ensure pricing has required fields before creating ProductInDB
+            if product_doc.get("pricing"):
+                if "avgPrice" not in product_doc["pricing"] or product_doc["pricing"].get("avgPrice") is None:
+                    product_doc["pricing"]["avgPrice"] = 0.0
+                if "currency" not in product_doc["pricing"]:
+                    product_doc["pricing"]["currency"] = "USD"
 
             products.append(ProductInDB(**product_doc))
 

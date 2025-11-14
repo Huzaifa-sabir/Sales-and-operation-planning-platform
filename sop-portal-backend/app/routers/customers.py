@@ -86,7 +86,7 @@ async def create_customer(
 )
 async def list_customers(
     page: int = Query(default=1, ge=1, description="Page number"),
-    pageSize: int = Query(default=10, ge=1, le=100, description="Items per page"),
+    pageSize: int = Query(default=10, ge=1, le=1000, description="Items per page"),
     isActive: Optional[bool] = Query(None, description="Filter by active status"),
     search: Optional[str] = Query(None, description="Search in customerId, customerName, contactPerson, contactEmail"),
     db: AsyncIOMotorDatabase = Depends(get_db),
@@ -175,6 +175,52 @@ async def get_active_customers(
         )
         for customer in customers
     ]
+
+
+@router.get(
+    "/statistics",
+    summary="Get customer statistics",
+    description="Get aggregated customer statistics (total, active, YTD sales)"
+)
+async def get_customer_statistics(
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """
+    Get customer statistics
+    
+    Returns:
+    - total: Total number of customers
+    - active: Number of active customers
+    - inactive: Number of inactive customers
+    - totalYtdSales: Total YTD sales from sales history
+    """
+    from datetime import datetime
+    from app.services.sales_history_service import SalesHistoryService
+    
+    customer_service = CustomerService(db)
+    sales_service = SalesHistoryService(db)
+    
+    # Get total customers
+    total_customers = await db.customers.count_documents({})
+    
+    # Get active customers
+    active_customers = await db.customers.count_documents({"isActive": True})
+    
+    # Get inactive customers
+    inactive_customers = total_customers - active_customers
+    
+    # Calculate YTD sales from sales history
+    current_year = datetime.now().year
+    ytd_sales_stats = await sales_service.get_sales_statistics(year=current_year)
+    total_ytd_sales = ytd_sales_stats.get("totalRevenue", 0)
+    
+    return {
+        "total": total_customers,
+        "active": active_customers,
+        "inactive": inactive_customers,
+        "totalYtdSales": round(total_ytd_sales, 2)
+    }
 
 
 @router.get(

@@ -51,20 +51,38 @@ class MatrixService:
             "productId": matrix_data.productId
         })
         if existing:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Matrix entry for customer '{matrix_data.customerId}' and product '{matrix_data.productId}' already exists"
+            # Update existing entry instead of raising error
+            update_data = {
+                "customerName": matrix_data.customerName,
+                "productCode": matrix_data.productCode,
+                "productDescription": matrix_data.productDescription,
+                "isActive": matrix_data.isActive if matrix_data.isActive is not None else True,
+                "customerSpecificPrice": matrix_data.customerSpecificPrice,
+                "lastOrderDate": matrix_data.lastOrderDate,
+                "totalOrdersQty": matrix_data.totalOrdersQty,
+                "notes": matrix_data.notes,
+                "updatedAt": datetime.utcnow()
+            }
+            await self.collection.update_one(
+                {"customerId": matrix_data.customerId, "productId": matrix_data.productId},
+                {"$set": update_data}
             )
+            existing.update(update_data)
+            existing["_id"] = str(existing["_id"])
+            return ProductCustomerMatrixInDB(**existing)
 
         # Create matrix document
         matrix_doc = {
             "customerId": matrix_data.customerId,
+            "customerName": matrix_data.customerName,
             "productId": matrix_data.productId,
-            "customerPrice": matrix_data.customerPrice,
-            "minimumOrderQty": matrix_data.minimumOrderQty,
-            "maximumOrderQty": matrix_data.maximumOrderQty,
-            "leadTimeDays": matrix_data.leadTimeDays,
-            "isActive": True,
+            "productCode": matrix_data.productCode,
+            "productDescription": matrix_data.productDescription,
+            "isActive": matrix_data.isActive if matrix_data.isActive is not None else True,
+            "customerSpecificPrice": matrix_data.customerSpecificPrice,
+            "lastOrderDate": matrix_data.lastOrderDate,
+            "totalOrdersQty": matrix_data.totalOrdersQty,
+            "notes": matrix_data.notes,
             "createdAt": datetime.utcnow(),
             "updatedAt": datetime.utcnow()
         }

@@ -20,6 +20,7 @@ class MatrixCreateRequest(BaseModel):
 
 class MatrixUpdateRequest(BaseModel):
     """Request schema for updating matrix entry"""
+    isActive: Optional[bool] = None
     customerPrice: Optional[float] = Field(None, ge=0)
     minimumOrderQty: Optional[int] = Field(None, ge=0)
     maximumOrderQty: Optional[int] = Field(None, ge=0)

@@ -41,15 +41,15 @@ class SOPCycleService:
         anchor_date = cycle_data.planningStartMonth or start_date
         planning_period = calculate_16_month_period(anchor_date)
 
-        # Calculate submission deadline from start_date
-        submission_deadline = calculate_submission_deadline(start_date)
-
         # Compute end of month if not provided
         if cycle_data.endDate:
             end_date = cycle_data.endDate
         else:
             next_month = (start_date.replace(day=28) + timedelta(days=4)).replace(day=1)
             end_date = next_month - timedelta(days=1)
+
+        # Calculate submission deadline preferring explicit end_date
+        submission_deadline = calculate_submission_deadline(start_date, cycle_end=end_date)
 
         # Validations
         if end_date <= start_date:
@@ -128,6 +128,26 @@ class SOPCycleService:
             update_data["cycleYear"] = update_data["year"] or existing_cycle.cycleYear
         if "month" in update_data:
             update_data["cycleMonth"] = update_data["month"] or existing_cycle.cycleMonth
+
+        # Handle startDate and endDate updates - update dates object using dot notation
+        dates_updates = {}
+        new_start = existing_cycle.dates.startDate
+        new_end = existing_cycle.dates.endDate
+        
+        if "startDate" in update_data:
+            new_start = update_data.pop("startDate")
+            dates_updates["dates.startDate"] = new_start
+        if "endDate" in update_data:
+            new_end = update_data.pop("endDate")
+            dates_updates["dates.endDate"] = new_end
+        
+        if dates_updates:
+            # Recalculate submission deadline with new dates
+            submission_deadline = calculate_submission_deadline(new_start, cycle_end=new_end)
+            dates_updates["dates.submissionDeadline"] = submission_deadline
+            
+            # Merge dates updates into update_data
+            update_data.update(dates_updates)
 
         if update_data:
             update_data["updatedAt"] = datetime.utcnow()

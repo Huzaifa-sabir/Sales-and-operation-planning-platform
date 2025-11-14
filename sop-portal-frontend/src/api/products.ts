@@ -33,6 +33,42 @@ export const productsAPI = {
     return response.data;
   },
 
+  // Get products by customer (filtered by product-customer matrix)
+  getByCustomer: async (customerId: string, filters?: TableFilters): Promise<{
+    products: Product[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  }> => {
+    const params = new URLSearchParams();
+    params.append('customerId', customerId); // Make sure customerId is passed correctly
+
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString()); // Backend accepts both limit and pageSize
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.groupCode) params.append('group_code', filters.groupCode as string);
+    if (filters?.location) params.append('location', filters.location as string);
+    if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString());
+
+    console.log(`[productsAPI.getByCustomer] Calling API with customerId=${customerId}, params=${params.toString()}`);
+    
+    const response = await axiosInstance.get<{
+      products: Product[];
+      total: number;
+      page: number;
+      pageSize: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    }>(`/products?${params.toString()}`);
+    
+    console.log(`[productsAPI.getByCustomer] Received ${response.data.products.length} products for customer ${customerId}`);
+    return response.data;
+  },
+
   // Get single product
   getById: async (id: string): Promise<Product> => {
     const response = await axiosInstance.get<Product>(`/products/${id}`);
@@ -82,6 +118,17 @@ export const productsAPI = {
     const response = await axiosInstance.get('/excel/templates/products', {
       responseType: 'blob',
     });
+    return response.data;
+  },
+
+  // Get statistics
+  getStatistics: async (): Promise<{
+    total: number;
+    active: number;
+    inactive: number;
+    groups: number;
+  }> => {
+    const response = await axiosInstance.get('/products/statistics');
     return response.data;
   },
 };

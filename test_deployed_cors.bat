@@ -27,3 +27,4 @@ echo - Look for "Access-Control-Allow-Origin: https://soptest.netlify.app"
 echo - If missing, the deployed backend needs to be updated
 echo ========================================
 pause
+

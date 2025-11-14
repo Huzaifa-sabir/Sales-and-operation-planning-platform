@@ -52,8 +52,32 @@ async def create_matrix_entry(
     """
     matrix_service = MatrixService(db)
 
-    # Convert request to MatrixCreate model
-    matrix_create = ProductCustomerMatrixCreate(**matrix_data.model_dump())
+    # Get customer and product info to populate required fields
+    customer = await matrix_service.customers_collection.find_one({"customerId": matrix_data.customerId})
+    if not customer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Customer '{matrix_data.customerId}' not found"
+        )
+    
+    product = await matrix_service.products_collection.find_one({"itemCode": matrix_data.productId})
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product '{matrix_data.productId}' not found"
+        )
+
+    # Convert request to MatrixCreate model with required fields
+    matrix_create_data = matrix_data.model_dump()
+    # Map customerPrice to customerSpecificPrice if provided
+    if "customerPrice" in matrix_create_data:
+        matrix_create_data["customerSpecificPrice"] = matrix_create_data.pop("customerPrice")
+    
+    matrix_create_data["customerName"] = customer.get("customerName", customer.get("customerId", ""))
+    matrix_create_data["productCode"] = product.get("itemCode", matrix_data.productId)
+    matrix_create_data["productDescription"] = product.get("itemDescription", product.get("description", ""))
+    
+    matrix_create = ProductCustomerMatrixCreate(**matrix_create_data)
 
     created_matrix = await matrix_service.create_matrix_entry(matrix_create)
 
@@ -61,12 +85,15 @@ async def create_matrix_entry(
     return ProductCustomerMatrixResponse(
         id=created_matrix.id,
         customerId=created_matrix.customerId,
+        customerName=created_matrix.customerName,
         productId=created_matrix.productId,
-        customerPrice=created_matrix.customerPrice,
-        minimumOrderQty=created_matrix.minimumOrderQty,
-        maximumOrderQty=created_matrix.maximumOrderQty,
-        leadTimeDays=created_matrix.leadTimeDays,
+        productCode=created_matrix.productCode,
+        productDescription=created_matrix.productDescription,
         isActive=created_matrix.isActive,
+        customerSpecificPrice=created_matrix.customerSpecificPrice,
+        lastOrderDate=created_matrix.lastOrderDate,
+        totalOrdersQty=created_matrix.totalOrdersQty,
+        notes=created_matrix.notes,
         createdAt=created_matrix.createdAt,
         updatedAt=created_matrix.updatedAt
     )
@@ -91,11 +118,29 @@ async def bulk_create_matrix_entries(
     """
     matrix_service = MatrixService(db)
 
-    # Convert requests to MatrixCreate models
-    matrix_creates = [
-        ProductCustomerMatrixCreate(**entry.model_dump())
-        for entry in bulk_data.entries
-    ]
+    # Convert requests to MatrixCreate models, populating required fields
+    matrix_creates = []
+    for entry in bulk_data.entries:
+        # Get customer and product info
+        customer = await matrix_service.customers_collection.find_one({"customerId": entry.customerId})
+        if not customer:
+            continue
+        
+        product = await matrix_service.products_collection.find_one({"itemCode": entry.productId})
+        if not product:
+            continue
+        
+        # Build matrix create data with required fields
+        matrix_create_data = entry.model_dump()
+        # Map customerPrice to customerSpecificPrice if provided
+        if "customerPrice" in matrix_create_data:
+            matrix_create_data["customerSpecificPrice"] = matrix_create_data.pop("customerPrice")
+        
+        matrix_create_data["customerName"] = customer.get("customerName", customer.get("customerId", ""))
+        matrix_create_data["productCode"] = product.get("itemCode", entry.productId)
+        matrix_create_data["productDescription"] = product.get("itemDescription", product.get("description", ""))
+        
+        matrix_creates.append(ProductCustomerMatrixCreate(**matrix_create_data))
 
     result = await matrix_service.bulk_create_matrix_entries(matrix_creates)
 
@@ -104,12 +149,15 @@ async def bulk_create_matrix_entries(
         ProductCustomerMatrixResponse(
             id=entry.id,
             customerId=entry.customerId,
+            customerName=entry.customerName,
             productId=entry.productId,
-            customerPrice=entry.customerPrice,
-            minimumOrderQty=entry.minimumOrderQty,
-            maximumOrderQty=entry.maximumOrderQty,
-            leadTimeDays=entry.leadTimeDays,
+            productCode=entry.productCode,
+            productDescription=entry.productDescription,
             isActive=entry.isActive,
+            customerSpecificPrice=entry.customerSpecificPrice,
+            lastOrderDate=entry.lastOrderDate,
+            totalOrdersQty=entry.totalOrdersQty,
+            notes=entry.notes,
             createdAt=entry.createdAt,
             updatedAt=entry.updatedAt
         )
@@ -165,12 +213,15 @@ async def list_matrix_entries(
         ProductCustomerMatrixResponse(
             id=entry.id,
             customerId=entry.customerId,
+            customerName=entry.customerName,
             productId=entry.productId,
-            customerPrice=entry.customerPrice,
-            minimumOrderQty=entry.minimumOrderQty,
-            maximumOrderQty=entry.maximumOrderQty,
-            leadTimeDays=entry.leadTimeDays,
+            productCode=entry.productCode,
+            productDescription=entry.productDescription,
             isActive=entry.isActive,
+            customerSpecificPrice=entry.customerSpecificPrice,
+            lastOrderDate=entry.lastOrderDate,
+            totalOrdersQty=entry.totalOrdersQty,
+            notes=entry.notes,
             createdAt=entry.createdAt,
             updatedAt=entry.updatedAt
         )
@@ -212,12 +263,15 @@ async def get_matrix_entry(
     return ProductCustomerMatrixResponse(
         id=matrix_entry.id,
         customerId=matrix_entry.customerId,
+        customerName=matrix_entry.customerName,
         productId=matrix_entry.productId,
-        customerPrice=matrix_entry.customerPrice,
-        minimumOrderQty=matrix_entry.minimumOrderQty,
-        maximumOrderQty=matrix_entry.maximumOrderQty,
-        leadTimeDays=matrix_entry.leadTimeDays,
+        productCode=matrix_entry.productCode,
+        productDescription=matrix_entry.productDescription,
         isActive=matrix_entry.isActive,
+        customerSpecificPrice=matrix_entry.customerSpecificPrice,
+        lastOrderDate=matrix_entry.lastOrderDate,
+        totalOrdersQty=matrix_entry.totalOrdersQty,
+        notes=matrix_entry.notes,
         createdAt=matrix_entry.createdAt,
         updatedAt=matrix_entry.updatedAt
     )
@@ -238,8 +292,12 @@ async def update_matrix_entry(
     """Update matrix entry (Admin only)"""
     matrix_service = MatrixService(db)
 
-    # Convert request to MatrixUpdate model
-    update_data = ProductCustomerMatrixUpdate(**matrix_update.model_dump(exclude_unset=True))
+    # Convert request to MatrixUpdate model, mapping customerPrice to customerSpecificPrice
+    update_dict = matrix_update.model_dump(exclude_unset=True)
+    if "customerPrice" in update_dict:
+        update_dict["customerSpecificPrice"] = update_dict.pop("customerPrice")
+    
+    update_data = ProductCustomerMatrixUpdate(**update_dict)
 
     updated_matrix = await matrix_service.update_matrix_entry(matrix_id, update_data)
 
@@ -252,12 +310,15 @@ async def update_matrix_entry(
     return ProductCustomerMatrixResponse(
         id=updated_matrix.id,
         customerId=updated_matrix.customerId,
+        customerName=updated_matrix.customerName,
         productId=updated_matrix.productId,
-        customerPrice=updated_matrix.customerPrice,
-        minimumOrderQty=updated_matrix.minimumOrderQty,
-        maximumOrderQty=updated_matrix.maximumOrderQty,
-        leadTimeDays=updated_matrix.leadTimeDays,
+        productCode=updated_matrix.productCode,
+        productDescription=updated_matrix.productDescription,
         isActive=updated_matrix.isActive,
+        customerSpecificPrice=updated_matrix.customerSpecificPrice,
+        lastOrderDate=updated_matrix.lastOrderDate,
+        totalOrdersQty=updated_matrix.totalOrdersQty,
+        notes=updated_matrix.notes,
         createdAt=updated_matrix.createdAt,
         updatedAt=updated_matrix.updatedAt
     )
@@ -287,12 +348,15 @@ async def toggle_matrix_status(
     return ProductCustomerMatrixResponse(
         id=updated_matrix.id,
         customerId=updated_matrix.customerId,
+        customerName=updated_matrix.customerName,
         productId=updated_matrix.productId,
-        customerPrice=updated_matrix.customerPrice,
-        minimumOrderQty=updated_matrix.minimumOrderQty,
-        maximumOrderQty=updated_matrix.maximumOrderQty,
-        leadTimeDays=updated_matrix.leadTimeDays,
+        productCode=updated_matrix.productCode,
+        productDescription=updated_matrix.productDescription,
         isActive=updated_matrix.isActive,
+        customerSpecificPrice=updated_matrix.customerSpecificPrice,
+        lastOrderDate=updated_matrix.lastOrderDate,
+        totalOrdersQty=updated_matrix.totalOrdersQty,
+        notes=updated_matrix.notes,
         createdAt=updated_matrix.createdAt,
         updatedAt=updated_matrix.updatedAt
     )

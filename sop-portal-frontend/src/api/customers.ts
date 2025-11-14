@@ -15,10 +15,10 @@ export const customersAPI = {
     const params = new URLSearchParams();
 
     if (filters?.page) params.append('page', filters.page.toString());
-    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.limit) params.append('pageSize', filters.limit.toString()); // Backend expects pageSize
     if (filters?.search) params.append('search', filters.search);
     if (filters?.salesRepId) params.append('sales_rep_id', filters.salesRepId as string);
-    if (filters?.isActive !== undefined) params.append('is_active', filters.isActive.toString());
+    if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString()); // Backend expects isActive
 
     const response = await axiosInstance.get<{
       customers: Customer[];
@@ -81,6 +81,17 @@ export const customersAPI = {
     const response = await axiosInstance.get('/excel/templates/customers', {
       responseType: 'blob',
     });
+    return response.data;
+  },
+
+  // Get statistics
+  getStatistics: async (): Promise<{
+    total: number;
+    active: number;
+    inactive: number;
+    totalYtdSales: number;
+  }> => {
+    const response = await axiosInstance.get('/customers/statistics');
     return response.data;
   },
 };

@@ -22,6 +22,7 @@ class CycleCreateRequest(BaseModel):
 class CycleUpdateRequest(BaseModel):
     """Request schema for updating a cycle"""
     cycleName: Optional[str] = Field(None, min_length=1, max_length=200)
+    startDate: Optional[datetime] = None
     endDate: Optional[datetime] = None
     year: Optional[int] = None
     month: Optional[int] = None

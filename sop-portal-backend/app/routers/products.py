@@ -74,8 +74,8 @@ async def create_product(
 )
 async def list_products(
     page: int = Query(default=1, ge=1, description="Page number"),
-    limit: int = Query(default=10, ge=1, le=100, description="Items per page", alias="limit"),
-    pageSize: Optional[int] = Query(None, ge=1, le=100, description="Items per page (alternative param)"),
+    limit: int = Query(default=10, ge=1, le=1000, description="Items per page", alias="limit"),
+    pageSize: Optional[int] = Query(None, ge=1, le=1000, description="Items per page (alternative param)"),
     isActive: Optional[bool] = Query(None, description="Filter by active status", alias="isActive"),
     is_active: Optional[bool] = Query(None, description="Filter by active status (alternative)"),
     search: Optional[str] = Query(None, description="Search in itemCode, itemDescription"),
@@ -195,6 +195,45 @@ async def get_active_products(
         )
         for product in products
     ]
+
+
+@router.get(
+    "/statistics",
+    summary="Get product statistics",
+    description="Get aggregated product statistics (total, active, groups)"
+)
+async def get_product_statistics(
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """
+    Get product statistics
+    
+    Returns:
+    - total: Total number of products
+    - active: Number of active products
+    - inactive: Number of inactive products
+    - groups: Number of unique product groups
+    """
+    # Get total products
+    total_products = await db.products.count_documents({})
+    
+    # Get active products
+    active_products = await db.products.count_documents({"isActive": True})
+    
+    # Get inactive products
+    inactive_products = total_products - active_products
+    
+    # Get unique product groups
+    unique_groups = await db.products.distinct("group.code")
+    groups_count = len([g for g in unique_groups if g])  # Filter out None values
+    
+    return {
+        "total": total_products,
+        "active": active_products,
+        "inactive": inactive_products,
+        "groups": groups_count
+    }
 
 
 @router.get(

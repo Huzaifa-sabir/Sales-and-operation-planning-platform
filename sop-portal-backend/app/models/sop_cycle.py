@@ -62,6 +62,9 @@ class SOPCycleUpdate(BaseModel):
     year: Optional[int] = None
     month: Optional[int] = None
     planningStartMonth: Optional[datetime] = None
+    # Allow direct date updates (for API convenience)
+    startDate: Optional[datetime] = None
+    endDate: Optional[datetime] = None
 
 
 class SOPCycleInDB(SOPCycleBase):

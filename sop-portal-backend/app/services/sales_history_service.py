@@ -37,10 +37,48 @@ class SalesHistoryService:
         query = {}
 
         if customer_id:
-            query["customerId"] = customer_id
+            # Try to find customer by business ID first
+            customer = await self.db.customers.find_one({"customerId": customer_id})
+            if customer:
+                # Match by customerName since sales_history might use names
+                customer_name = customer.get("customerName")
+                if customer_name:
+                    query["customerName"] = customer_name
+                else:
+                    # Fallback to customerId match
+                    query["$or"] = [
+                        {"customerId": customer_id},
+                        {"customerName": customer_id}
+                    ]
+            else:
+                # Try direct match (might be ObjectId or name)
+                query["$or"] = [
+                    {"customerId": customer_id},
+                    {"customerName": customer_id}
+                ]
 
         if product_id:
-            query["productId"] = product_id
+            # Match by productId (item code) or productCode
+            product_filter = {
+                "$or": [
+                    {"productId": product_id},
+                    {"productCode": product_id}
+                ]
+            }
+            # Combine with existing customer filter
+            if "customerName" in query:
+                customer_name = query.pop("customerName")
+                query["$and"] = [
+                    {"customerName": customer_name},
+                    product_filter
+                ]
+            elif "$or" in query:
+                # Extract customer filter from $or
+                customer_filter = {"$or": query.pop("$or")}
+                query["$and"] = [customer_filter, product_filter]
+            else:
+                # No customer filter, just add product filter
+                query.update(product_filter)
 
         # Date range filtering
         if year and month:
@@ -139,10 +177,40 @@ class SalesHistoryService:
         match_stage = {}
 
         if customer_id:
-            match_stage["customerId"] = customer_id
+            # Try to find customer by business ID
+            customer = await self.db.customers.find_one({"customerId": customer_id})
+            if customer:
+                customer_name = customer.get("customerName")
+                if customer_name:
+                    match_stage["customerName"] = customer_name
+                else:
+                    match_stage["$or"] = [
+                        {"customerId": customer_id},
+                        {"customerName": customer_id}
+                    ]
+            else:
+                match_stage["$or"] = [
+                    {"customerId": customer_id},
+                    {"customerName": customer_id}
+                ]
 
         if product_id:
-            match_stage["productId"] = product_id
+            # Match by productId (item code) or productCode
+            if "$or" in match_stage:
+                # Combine with existing customer filter
+                customer_filter = match_stage.pop("$or") if "$or" in match_stage else match_stage
+                match_stage["$and"] = [
+                    customer_filter if isinstance(customer_filter, dict) else {"$or": customer_filter},
+                    {"$or": [
+                        {"productId": product_id},
+                        {"productCode": product_id}
+                    ]}
+                ]
+            else:
+                match_stage["$or"] = [
+                    {"productId": product_id},
+                    {"productCode": product_id}
+                ]
 
         # Year/month filtering
         if year and month:
@@ -219,10 +287,48 @@ class SalesHistoryService:
         match_stage = {}
 
         if customer_id:
-            match_stage["customerId"] = customer_id
+            # Try to find customer by business ID
+            customer = await self.db.customers.find_one({"customerId": customer_id})
+            if customer:
+                customer_name = customer.get("customerName")
+                if customer_name:
+                    match_stage["customerName"] = customer_name
+                else:
+                    match_stage["$or"] = [
+                        {"customerId": customer_id},
+                        {"customerName": customer_id}
+                    ]
+            else:
+                match_stage["$or"] = [
+                    {"customerId": customer_id},
+                    {"customerName": customer_id}
+                ]
 
         if product_id:
-            match_stage["productId"] = product_id
+            # Match by productId (item code) or productCode
+            if "customerName" in match_stage:
+                customer_name = match_stage.pop("customerName")
+                match_stage["$and"] = [
+                    {"customerName": customer_name},
+                    {"$or": [
+                        {"productId": product_id},
+                        {"productCode": product_id}
+                    ]}
+                ]
+            elif "$or" in match_stage:
+                customer_filter = match_stage.pop("$or")
+                match_stage["$and"] = [
+                    {"$or": customer_filter},
+                    {"$or": [
+                        {"productId": product_id},
+                        {"productCode": product_id}
+                    ]}
+                ]
+            else:
+                match_stage["$or"] = [
+                    {"productId": product_id},
+                    {"productCode": product_id}
+                ]
 
         # Calculate date range for last N months
         end_date = datetime.now()
@@ -284,7 +390,22 @@ class SalesHistoryService:
         match_stage = {}
 
         if customer_id:
-            match_stage["customerId"] = customer_id
+            # Try to find customer by business ID
+            customer = await self.db.customers.find_one({"customerId": customer_id})
+            if customer:
+                customer_name = customer.get("customerName")
+                if customer_name:
+                    match_stage["customerName"] = customer_name
+                else:
+                    match_stage["$or"] = [
+                        {"customerId": customer_id},
+                        {"customerName": customer_id}
+                    ]
+            else:
+                match_stage["$or"] = [
+                    {"customerId": customer_id},
+                    {"customerName": customer_id}
+                ]
 
         # Calculate date range
         end_date = datetime.now()
@@ -337,7 +458,11 @@ class SalesHistoryService:
         match_stage = {}
 
         if product_id:
-            match_stage["productId"] = product_id
+            # Match by productId (item code) or productCode
+            match_stage["$or"] = [
+                {"productId": product_id},
+                {"productCode": product_id}
+            ]
 
         pipeline = []
 

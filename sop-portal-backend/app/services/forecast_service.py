@@ -473,3 +473,136 @@ class ForecastService:
         stats["totalRevenue"] = round(stats["totalRevenue"], 2)
 
         return stats
+
+    async def bulk_create_forecasts(
+        self,
+        cycle_id: str,
+        customer_id: str,
+        forecasts_data: List[Dict[str, Any]],
+        sales_rep_id: str
+    ) -> List[ForecastInDB]:
+        """
+        Create multiple forecasts for one customer at once
+        - Validates cycle is open
+        - Validates products are active for customer
+        - Creates/updates forecasts
+        """
+        # Validate cycle exists and is open
+        try:
+            cycle = await self.cycles_collection.find_one({"_id": ObjectId(cycle_id)})
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid cycle ID format"
+            )
+
+        if not cycle:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="S&OP cycle not found"
+            )
+
+        if cycle.get("status") != CycleStatus.OPEN:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Cannot create forecast for cycle in {cycle.get('status')} status. Cycle must be OPEN."
+            )
+
+        # Validate customer exists
+        customer = await self.customers_collection.find_one({"customerId": customer_id})
+        if not customer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Customer {customer_id} not found"
+            )
+
+        created_forecasts = []
+        
+        for forecast_item in forecasts_data:
+            product_id = forecast_item.get("productId")
+            monthly_forecasts_data = forecast_item.get("monthlyForecasts", [])
+            
+            if not product_id:
+                continue
+            
+            # Validate product exists
+            product = await self.products_collection.find_one({"itemCode": product_id})
+            if not product:
+                continue
+            
+            # Check if forecast already exists
+            existing = await self.collection.find_one({
+                "cycleId": cycle_id,
+                "customerId": customer_id,
+                "productId": product_id,
+                "salesRepId": sales_rep_id
+            })
+            
+            # Convert monthly forecasts data to MonthlyForecast objects
+            monthly_forecasts = []
+            for mf_data in monthly_forecasts_data:
+                if isinstance(mf_data, dict):
+                    monthly_forecasts.append(MonthlyForecast(**mf_data))
+                else:
+                    monthly_forecasts.append(mf_data)
+            
+            # Apply pricing
+            use_customer_price = forecast_item.get("useCustomerPrice", True)
+            override_price = forecast_item.get("overridePrice")
+            
+            monthly_forecasts_with_pricing = await self.apply_pricing_to_months(
+                monthly_forecasts,
+                use_customer_price,
+                customer_id,
+                product_id,
+                override_price
+            )
+            
+            # Calculate totals
+            totals = self.calculate_totals(monthly_forecasts_with_pricing)
+            
+            if existing:
+                # Update existing forecast (only if DRAFT)
+                if existing.get("status") == ForecastStatus.DRAFT:
+                    update_data = {
+                        "monthlyForecasts": [m.model_dump() for m in monthly_forecasts_with_pricing],
+                        "useCustomerPrice": use_customer_price,
+                        "overridePrice": override_price,
+                        "totalQuantity": totals["totalQuantity"],
+                        "totalRevenue": totals["totalRevenue"],
+                        "notes": forecast_item.get("notes"),
+                        "updatedAt": datetime.utcnow()
+                    }
+                    await self.collection.update_one(
+                        {"_id": existing["_id"]},
+                        {"$set": update_data}
+                    )
+                    existing["_id"] = str(existing["_id"])
+                    existing.update(update_data)
+                    created_forecasts.append(ForecastInDB(**existing))
+            else:
+                # Create new forecast
+                forecast_doc = {
+                    "cycleId": cycle_id,
+                    "customerId": customer_id,
+                    "productId": product_id,
+                    "salesRepId": sales_rep_id,
+                    "status": ForecastStatus.DRAFT,
+                    "monthlyForecasts": [m.model_dump() for m in monthly_forecasts_with_pricing],
+                    "useCustomerPrice": use_customer_price,
+                    "overridePrice": override_price,
+                    "totalQuantity": totals["totalQuantity"],
+                    "totalRevenue": totals["totalRevenue"],
+                    "version": 1,
+                    "previousVersionId": None,
+                    "notes": forecast_item.get("notes"),
+                    "createdAt": datetime.utcnow(),
+                    "updatedAt": datetime.utcnow(),
+                    "submittedAt": None
+                }
+                
+                result = await self.collection.insert_one(forecast_doc)
+                forecast_doc["_id"] = str(result.inserted_id)
+                created_forecasts.append(ForecastInDB(**forecast_doc))
+        
+        return created_forecasts

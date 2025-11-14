@@ -22,7 +22,9 @@ from app.schemas.forecast_schemas import (
     ForecastSubmitResponse,
     ForecastStatisticsResponse,
     MessageResponse,
-    BulkImportResponse
+    BulkImportResponse,
+    BulkCreateForecastRequest,
+    BulkCreateForecastResponse
 )
 from app.services.forecast_service import ForecastService
 from app.services.sop_cycle_service import SOPCycleService
@@ -719,4 +721,75 @@ async def export_forecasts(
         headers={
             "Content-Disposition": f"attachment; filename=forecasts_{cycle.cycleName.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.xlsx"
         }
+    )
+
+
+@router.post(
+    "/bulk",
+    response_model=BulkCreateForecastResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Bulk create forecasts for one customer",
+    description="Create multiple forecasts for one customer at once"
+)
+async def bulk_create_forecasts(
+    bulk_data: BulkCreateForecastRequest,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """
+    Bulk create forecasts for one customer
+    
+    Creates or updates multiple forecasts for a single customer.
+    All forecasts must be for the same customer and cycle.
+    """
+    forecast_service = ForecastService(db)
+    
+    # Create forecasts
+    created_forecasts = await forecast_service.bulk_create_forecasts(
+        cycle_id=bulk_data.cycleId,
+        customer_id=bulk_data.customerId,
+        forecasts_data=bulk_data.forecasts,
+        sales_rep_id=current_user.id
+    )
+    
+    # Count created vs updated
+    created_count = 0
+    updated_count = 0
+    
+    # Convert to response models
+    forecasts_response = []
+    for f in created_forecasts:
+        forecasts_response.append(
+            ForecastResponse(
+                id=f.id,
+                cycleId=f.cycleId,
+                customerId=f.customerId,
+                productId=f.productId,
+                salesRepId=f.salesRepId,
+                status=f.status,
+                monthlyForecasts=f.monthlyForecasts,
+                useCustomerPrice=f.useCustomerPrice,
+                overridePrice=f.overridePrice,
+                totalQuantity=f.totalQuantity,
+                totalRevenue=f.totalRevenue,
+                version=f.version,
+                previousVersionId=f.previousVersionId,
+                notes=f.notes,
+                createdAt=f.createdAt,
+                updatedAt=f.updatedAt,
+                submittedAt=f.submittedAt
+            )
+        )
+        # Check if this was newly created (createdAt == updatedAt) or updated
+        if f.createdAt == f.updatedAt:
+            created_count += 1
+        else:
+            updated_count += 1
+    
+    return BulkCreateForecastResponse(
+        success=True,
+        message=f"Successfully processed {len(created_forecasts)} forecasts",
+        forecasts=forecasts_response,
+        created=created_count,
+        updated=updated_count
     )
